@@ -1,0 +1,52 @@
+[
+  {
+    "id": "national",
+    "bn": "জাতীয়",
+    "en": "National"
+  },
+  {
+    "id": "international",
+    "bn": "আন্তর্জাতিক",
+    "en": "International"
+  },
+  {
+    "id": "politics",
+    "bn": "রাজনীতি",
+    "en": "Politics"
+  },
+  {
+    "id": "economy",
+    "bn": "অর্থনীতি",
+    "en": "Economy"
+  },
+  {
+    "id": "sports",
+    "bn": "খেলা",
+    "en": "Sports"
+  },
+  {
+    "id": "technology",
+    "bn": "প্রযুক্তি",
+    "en": "Technology"
+  },
+  {
+    "id": "entertainment",
+    "bn": "বিনোদন",
+    "en": "Entertainment"
+  },
+  {
+    "id": "health",
+    "bn": "স্বাস্থ্য",
+    "en": "Health"
+  },
+  {
+    "id": "science",
+    "bn": "বিজ্ঞান",
+    "en": "Science"
+  },
+  {
+    "id": "engineering",
+    "bn": "প্রকৌশল",
+    "en": "Engineering"
+  }
+]

@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // সব অ্যাক্সেস সার্ভার-সাইড (Admin SDK rules বাইপাস করে)।
+    // ক্লায়েন্ট থেকে সরাসরি পড়া বন্ধ রাখা হয়েছে, যাতে অন্য কেউ আপনার ফ্রি রিড কোটা শেষ করতে না পারে।
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

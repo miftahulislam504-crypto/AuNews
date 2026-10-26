@@ -1,0 +1,489 @@
+[
+  {
+    "id": "prothomalo",
+    "name": "প্রথম আলো",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.prothomalo.com/feed",
+    "enabled": true
+  },
+  {
+    "id": "banglatribune",
+    "name": "বাংলা ট্রিবিউন",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.banglatribune.com/feed",
+    "enabled": true
+  },
+  {
+    "id": "risingbd",
+    "name": "রাইজিংবিডি",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.risingbd.com/rss/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "daily-bangladesh",
+    "name": "ডেইলি বাংলাদেশ",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.daily-bangladesh.com/rss/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "jagonews24",
+    "name": "জাগো নিউজ",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.jagonews24.com/rss/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "banglanews24",
+    "name": "বাংলানিউজ২৪",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.banglanews24.com/rss/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "ittefaq",
+    "name": "ইত্তেফাক",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.ittefaq.com.bd/rss/rss.xml",
+    "alts": [
+      "https://www.ittefaq.com.bd/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "kalerkantho",
+    "name": "কালের কণ্ঠ",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.kalerkantho.com/rss.xml",
+    "alts": [
+      "https://www.kalerkantho.com/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "samakal",
+    "name": "সমকাল",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://samakal.com/rss.xml",
+    "alts": [
+      "https://samakal.com/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "bd-pratidin",
+    "name": "বাংলাদেশ প্রতিদিন",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.bd-pratidin.com/rss.xml",
+    "alts": [
+      "https://www.bd-pratidin.com/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "jugantor",
+    "name": "যুগান্তর",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.jugantor.com/rss.xml",
+    "alts": [
+      "https://www.jugantor.com/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "daily-star",
+    "name": "The Daily Star",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://www.thedailystar.net/rss.xml",
+    "alts": [
+      "https://www.thedailystar.net/frontpage/rss.xml"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "dhaka-tribune",
+    "name": "Dhaka Tribune",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://www.dhakatribune.com/feed",
+    "alts": [
+      "https://www.dhakatribune.com/rss.xml"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "bdnews24-en",
+    "name": "bdnews24.com",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://bdnews24.com/rss.xml",
+    "alts": [
+      "https://bdnews24.com/feed",
+      "https://bdnews24.com/rss/rss.xml"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "prothomalo-en",
+    "name": "Prothom Alo English",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://en.prothomalo.com/feed",
+    "enabled": true
+  },
+  {
+    "id": "tbs",
+    "name": "The Business Standard",
+    "scope": "bd",
+    "lang": "en",
+    "category": "economy",
+    "url": "https://www.tbsnews.net/rss.xml",
+    "alts": [
+      "https://www.tbsnews.net/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "financial-express-bd",
+    "name": "The Financial Express (BD)",
+    "scope": "bd",
+    "lang": "en",
+    "category": "economy",
+    "url": "https://thefinancialexpress.com.bd/rss.xml",
+    "alts": [
+      "https://thefinancialexpress.com.bd/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "ajkerpatrika",
+    "name": "আজকের পত্রিকা",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.ajkerpatrika.com/feed/",
+    "enabled": true
+  },
+  {
+    "id": "bd24live",
+    "name": "বিডি২৪লাইভ",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.bd24live.com/bangla/feed/",
+    "enabled": true
+  },
+  {
+    "id": "bd-journal",
+    "name": "বাংলাদেশ জার্নাল",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "national",
+    "url": "https://www.bd-journal.com/feed/latest-rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "energy-bangla",
+    "name": "এনার্জি বাংলা",
+    "scope": "bd",
+    "lang": "bn",
+    "category": "engineering",
+    "url": "https://energybangla.com/feed/",
+    "enabled": true
+  },
+  {
+    "id": "daily-asian-age",
+    "name": "The Asian Age (BD)",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://dailyasianage.com/rss/feed.xml",
+    "enabled": true
+  },
+  {
+    "id": "dhaka-post",
+    "name": "The Dhaka Post",
+    "scope": "bd",
+    "lang": "en",
+    "category": "national",
+    "url": "https://thedhakapost.com/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-bangla",
+    "name": "বিবিসি বাংলা",
+    "scope": "intl",
+    "lang": "bn",
+    "category": "international",
+    "url": "https://feeds.bbci.co.uk/bengali/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "dw-bangla",
+    "name": "ডিডব্লিউ বাংলা",
+    "scope": "intl",
+    "lang": "bn",
+    "category": "international",
+    "url": "https://rss.dw.com/xml/rss-bn-all",
+    "enabled": true
+  },
+  {
+    "id": "bbc-world",
+    "name": "BBC World",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-asia",
+    "name": "BBC Asia",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://feeds.bbci.co.uk/news/world/asia/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "aljazeera",
+    "name": "Al Jazeera",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://www.aljazeera.com/xml/rss/all.xml",
+    "enabled": true
+  },
+  {
+    "id": "dw-en",
+    "name": "DW English",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://rss.dw.com/xml/rss-en-all",
+    "enabled": true
+  },
+  {
+    "id": "guardian-world",
+    "name": "The Guardian World",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://www.theguardian.com/world/rss",
+    "enabled": true
+  },
+  {
+    "id": "nyt-world",
+    "name": "NYT World",
+    "scope": "intl",
+    "lang": "en",
+    "category": "international",
+    "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-politics",
+    "name": "BBC Politics",
+    "scope": "intl",
+    "lang": "en",
+    "category": "politics",
+    "url": "https://feeds.bbci.co.uk/news/politics/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "guardian-politics",
+    "name": "The Guardian Politics",
+    "scope": "intl",
+    "lang": "en",
+    "category": "politics",
+    "url": "https://www.theguardian.com/politics/rss",
+    "enabled": true
+  },
+  {
+    "id": "bbc-business",
+    "name": "BBC Business",
+    "scope": "intl",
+    "lang": "en",
+    "category": "economy",
+    "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-sport",
+    "name": "BBC Sport",
+    "scope": "intl",
+    "lang": "en",
+    "category": "sports",
+    "url": "https://feeds.bbci.co.uk/sport/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-football",
+    "name": "BBC Football",
+    "scope": "intl",
+    "lang": "en",
+    "category": "sports",
+    "url": "https://feeds.bbci.co.uk/sport/football/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "espn",
+    "name": "ESPN",
+    "scope": "intl",
+    "lang": "en",
+    "category": "sports",
+    "url": "https://www.espn.com/espn/rss/news",
+    "enabled": true
+  },
+  {
+    "id": "espncricinfo",
+    "name": "ESPNcricinfo",
+    "scope": "intl",
+    "lang": "en",
+    "category": "sports",
+    "url": "https://www.espncricinfo.com/rss/content/story/feeds/0.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-tech",
+    "name": "BBC Technology",
+    "scope": "intl",
+    "lang": "en",
+    "category": "technology",
+    "url": "https://feeds.bbci.co.uk/news/technology/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "techcrunch",
+    "name": "TechCrunch",
+    "scope": "intl",
+    "lang": "en",
+    "category": "technology",
+    "url": "https://techcrunch.com/feed/",
+    "enabled": true
+  },
+  {
+    "id": "the-verge",
+    "name": "The Verge",
+    "scope": "intl",
+    "lang": "en",
+    "category": "technology",
+    "url": "https://www.theverge.com/rss/index.xml",
+    "enabled": true
+  },
+  {
+    "id": "ars-technica",
+    "name": "Ars Technica",
+    "scope": "intl",
+    "lang": "en",
+    "category": "technology",
+    "url": "https://feeds.arstechnica.com/arstechnica/index",
+    "enabled": true
+  },
+  {
+    "id": "bbc-entertainment",
+    "name": "BBC Entertainment & Arts",
+    "scope": "intl",
+    "lang": "en",
+    "category": "entertainment",
+    "url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "variety",
+    "name": "Variety",
+    "scope": "intl",
+    "lang": "en",
+    "category": "entertainment",
+    "url": "https://variety.com/feed/",
+    "enabled": true
+  },
+  {
+    "id": "bbc-health",
+    "name": "BBC Health",
+    "scope": "intl",
+    "lang": "en",
+    "category": "health",
+    "url": "https://feeds.bbci.co.uk/news/health/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "who-news",
+    "name": "WHO News",
+    "scope": "intl",
+    "lang": "en",
+    "category": "health",
+    "url": "https://www.who.int/rss-feeds/news-english.xml",
+    "enabled": true
+  },
+  {
+    "id": "bbc-science",
+    "name": "BBC Science & Environment",
+    "scope": "intl",
+    "lang": "en",
+    "category": "science",
+    "url": "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+    "enabled": true
+  },
+  {
+    "id": "sciencedaily",
+    "name": "ScienceDaily",
+    "scope": "intl",
+    "lang": "en",
+    "category": "science",
+    "url": "https://www.sciencedaily.com/rss/all.xml",
+    "enabled": true
+  },
+  {
+    "id": "interesting-engineering",
+    "name": "Interesting Engineering",
+    "scope": "intl",
+    "lang": "en",
+    "category": "engineering",
+    "url": "https://interestingengineering.com/feed",
+    "alts": [
+      "https://interestingengineering.com/rss"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "dezeen-architecture",
+    "name": "Dezeen Architecture",
+    "scope": "intl",
+    "lang": "en",
+    "category": "engineering",
+    "url": "https://www.dezeen.com/architecture/feed/",
+    "alts": [
+      "https://www.dezeen.com/feed/"
+    ],
+    "enabled": true
+  }
+]

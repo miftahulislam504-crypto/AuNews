@@ -1,0 +1,48 @@
+{
+  "site": {
+    "name": "AuNews",
+    "tagline": "বাংলাদেশ ও বিশ্বের সব খবর, এক জায়গায়"
+  },
+  "retention": {
+    "days": 7,
+    "mode": "rolling"
+  },
+  "ingest": {
+    "intervalMinutes": 30,
+    "maxItemsPerFeedPerRun": 30,
+    "summaryMaxChars": 280,
+    "windowDays": 3,
+    "dailyWriteBudget": 15000
+  },
+  "snapshot": {
+    "perCategory": 80,
+    "all": 150,
+    "summaryChars": 160
+  },
+  "firestore": {
+    "collection": "articles"
+  },
+  "display": {
+    "defaultLanguage": "bn",
+    "showSourceAttribution": true
+  },
+  "cluster": {
+    "threshold": 0.45,
+    "minShared": 2,
+    "maxHoursApart": 48,
+    "trendingMinSources": 3,
+    "trendingWindowHours": 48,
+    "trendingLimit": 30
+  },
+  "ai": {
+    "enabled": true,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "batchSize": 10,
+    "maxRequestsPerRun": 4,
+    "dailyRequestBudget": 300,
+    "dailyTokenBudget": 170000,
+    "tokensPerMinute": 8000,
+    "translateSummary": false
+  }
+}
