@@ -1,20 +1,21 @@
 import categories from "@/config/categories.json";
 import settings from "@/config/settings.json";
-import { getDb } from "./firebaseAdmin";
+import { readData } from "./github";
 import { groupItems, type Group } from "./group";
 import { formatTimeLabel } from "./time";
 import type { FeedItem, SlimItem, StoredItem } from "./types";
 
 const DAY = 86400000;
 
-// ক্যাটাগরি স্ন্যাপশট (feeds/{id}) এক ডকুমেন্ট পড়ে — রিড খরচ ন্যূনতম।
+type Snapshot = { items?: StoredItem[]; updatedAt?: number };
+
+// ক্যাটাগরি স্ন্যাপশট (feeds/{id}.json) — ingest এটি প্রতি ৩০ মিনিটে হালনাগাদ করে
 export async function getFeed(
   categoryId: string
 ): Promise<{ items: FeedItem[]; updatedAt: number | null; updatedLabel: string | null }> {
   try {
-    const snap = await getDb().collection("feeds").doc(categoryId).get();
-    if (!snap.exists) return { items: [], updatedAt: null, updatedLabel: null };
-    const data = snap.data() as { items?: StoredItem[]; updatedAt?: number };
+    const data = await readData<Snapshot>(`feeds/${categoryId}.json`);
+    if (!data) return { items: [], updatedAt: null, updatedLabel: null };
     const cutoff = Date.now() - settings.retention.days * DAY;
     const items = (data.items ?? [])
       .filter((i) => i.publishedAt >= cutoff)
@@ -27,18 +28,15 @@ export async function getFeed(
   }
 }
 
-// সার্চের জন্য সব স্ন্যাপশট মিলিয়ে ইউনিক তালিকা (১১টি ডকুমেন্ট রিড, ১০ মিনিটে একবার)
+// সার্চের জন্য সব স্ন্যাপশট মিলিয়ে ইউনিক তালিকা (১১টি ফাইল, ১০ মিনিটে একবার)
 export async function getSearchIndex(): Promise<SlimItem[]> {
   try {
-    const db = getDb();
     const ids = ["all", ...categories.map((c) => c.id)];
-    const snaps = await db.getAll(...ids.map((id) => db.collection("feeds").doc(id)));
+    const snaps = await Promise.all(ids.map((id) => readData<Snapshot>(`feeds/${id}.json`)));
     const cutoff = Date.now() - settings.retention.days * DAY;
     const byId = new Map<string, StoredItem>();
     for (const s of snaps) {
-      if (!s.exists) continue;
-      const items = ((s.data() as { items?: StoredItem[] }).items ?? []) as StoredItem[];
-      for (const it of items) if (it.publishedAt >= cutoff && !byId.has(it.id)) byId.set(it.id, it);
+      for (const it of s?.items ?? []) if (it.publishedAt >= cutoff && !byId.has(it.id)) byId.set(it.id, it);
     }
     return [...byId.values()]
       .sort((a, b) => b.publishedAt - a.publishedAt)

@@ -1,6 +1,6 @@
 export type Scope = "bd" | "intl";
 
-// Firestore স্ন্যাপশটে যেভাবে সেভ থাকে
+// data ব্রাঞ্চের স্ন্যাপশট ফাইলে যেভাবে সেভ থাকে
 export interface StoredItem {
   id: string;
   title: string;
