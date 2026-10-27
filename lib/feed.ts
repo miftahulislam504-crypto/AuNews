@@ -63,3 +63,20 @@ export async function getTrending(): Promise<{ groups: Group[]; updatedLabel: st
     .slice(0, c.trendingLimit);
   return { groups, updatedLabel };
 }
+
+// একটি খবর আইডি দিয়ে খোঁজা (ইন-অ্যাপ রিডারের জন্য) — সব স্ন্যাপশটে খোঁজে
+export async function getItem(id: string): Promise<FeedItem | null> {
+  if (!/^[a-f0-9]{20}$/.test(id)) return null;
+  try {
+    const ids = ["all", ...categories.map((c) => c.id)];
+    const snaps = await Promise.all(ids.map((x) => readData<Snapshot>(`feeds/${x}.json`)));
+    for (const s of snaps) {
+      const it = s?.items?.find((i) => i.id === id);
+      if (it) return { ...it, timeLabel: formatTimeLabel(it.publishedAt) };
+    }
+    return null;
+  } catch (e) {
+    console.error("getItem failed:", e);
+    return null;
+  }
+}
