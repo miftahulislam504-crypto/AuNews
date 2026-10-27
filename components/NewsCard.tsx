@@ -1,15 +1,36 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import type { CSSProperties } from "react";
+import type { ReactNode } from "react";
 import { toBn } from "@/lib/bn";
+import { hueStyle, opensInApp } from "@/lib/reader";
 import type { FeedItem } from "@/lib/types";
 
-// সোর্স-ভেদে স্থির রঙ (sourceId থেকে hue)
-function hueStyle(id: string): CSSProperties {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
-  return { "--h": h } as CSSProperties;
+function ItemLink({
+  item,
+  forceExternal,
+  className,
+  children,
+}: {
+  item: FeedItem;
+  forceExternal: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  // prefetch বন্ধ: নইলে স্ক্রলে দেখা প্রতিটি কার্ডের জন্য সোর্স সাইট থেকে খবর আনা শুরু হবে
+  if (!forceExternal && opensInApp(item)) {
+    return (
+      <Link href={`/n/${item.id}`} prefetch={false} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={item.link} target="_blank" rel="noopener noreferrer" className={className}>
+      {children}
+    </a>
+  );
 }
 
 function initial(name: string): string {
@@ -29,6 +50,7 @@ export default function NewsCard({
   others,
   sourceCount,
   lead = false,
+  forceExternal = false,
 }: {
   item: FeedItem;
   saved: boolean;
@@ -36,6 +58,7 @@ export default function NewsCard({
   others?: FeedItem[];
   sourceCount?: number;
   lead?: boolean;
+  forceExternal?: boolean;
 }) {
   const [imgOk, setImgOk] = useState(true);
   const title = item.titleBn ?? item.title;
@@ -48,7 +71,7 @@ export default function NewsCard({
 
   return (
     <li className={cls}>
-      <a href={item.link} target="_blank" rel="noopener noreferrer" className="card-link">
+      <ItemLink item={item} forceExternal={forceExternal} className="card-link">
         <div className="card-body">
           <h2 className="card-title">{title}</h2>
           {item.titleBn ? (
@@ -70,7 +93,7 @@ export default function NewsCard({
             onError={() => setImgOk(false)}
           />
         ) : null}
-      </a>
+      </ItemLink>
       <div className="card-foot">
         <p className="card-meta">
           <span className="src" style={hueStyle(item.sourceId)}>
@@ -116,10 +139,10 @@ export default function NewsCard({
           <ul className="more-list">
             {(others as FeedItem[]).map((o) => (
               <li key={o.id}>
-                <a href={o.link} target="_blank" rel="noopener noreferrer">
+                <ItemLink item={o} forceExternal={forceExternal}>
                   <span className="more-src">{o.sourceName}</span>
                   {o.titleBn ?? o.title}
-                </a>
+                </ItemLink>
               </li>
             ))}
           </ul>

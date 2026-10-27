@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <footer className="footer">
           <p className="footer-tag">{settings.site.tagline}</p>
           <p className="footer-note">
-            শিরোনাম ও সংক্ষিপ্ত সারাংশ সংশ্লিষ্ট সোর্স থেকে নেওয়া। পুরো খবরের স্বত্ব সোর্সের; পড়তে মূল লিংকে যান।
+            খবরের স্বত্ব সংশ্লিষ্ট সোর্সের। প্রতিটি খবরের নিচে মূল লিংক দেওয়া আছে।
           </p>
         </footer>
         <ServiceWorkerRegister />

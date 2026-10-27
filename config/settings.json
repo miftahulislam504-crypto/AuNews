@@ -40,5 +40,11 @@
     "dailyTokenBudget": 170000,
     "tokensPerMinute": 8000,
     "translateSummary": false
+  },
+  "reader": {
+    "enabled": true,
+    "externalSources": [
+      "nyt-world"
+    ]
   }
 }

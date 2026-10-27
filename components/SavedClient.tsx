@@ -3,8 +3,12 @@
 import { useBookmarks } from "@/lib/bookmarks";
 import NewsCard from "./NewsCard";
 
+// সার্ভারে পুরনো খবর থাকে না; তাই ১ দিনের বেশি পুরনো সংরক্ষিত খবর সরাসরি মূল সাইটে খোলে
+const FRESH_MS = 24 * 3600 * 1000;
+
 export default function SavedClient() {
   const { items, ids, toggle } = useBookmarks();
+  const now = Date.now();
   return (
     <section>
       <p className="updated">সংরক্ষিত খবর শুধু এই ডিভাইসে থাকে।</p>
@@ -13,7 +17,7 @@ export default function SavedClient() {
       ) : (
         <ul className="list">
           {items.map((i) => (
-            <NewsCard key={i.id} item={i} saved={ids.has(i.id)} onToggle={toggle} />
+            <NewsCard key={i.id} item={i} saved={ids.has(i.id)} onToggle={toggle} forceExternal={now - i.publishedAt > FRESH_MS} />
           ))}
         </ul>
       )}

@@ -8,6 +8,8 @@
   --link: #0b6b52;
   --soft: #e3efe9;
   --gold: #e0a526;
+  --cta-bg: #0b4f3c;
+  --cta-ink: #ffffff;
   --tint: 40%;
   --fill: 32%;
   --wrap: 720px;
@@ -25,6 +27,8 @@
     --link: #5fcf9f;
     --soft: #17302a;
     --gold: #eab341;
+    --cta-bg: #5fcf9f;
+    --cta-ink: #08130f;
     --tint: 62%;
     --fill: 38%;
   }
@@ -244,3 +248,35 @@ details[open] > summary .chev { transform: rotate(180deg); }
 }
 .footer-tag { font-family: var(--serif); font-size: 15px; font-weight: 700; margin: 0 0 6px; }
 .footer-note { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 0; }
+
+/* ---------- Reader (ইন-অ্যাপ খবর পড়া) ---------- */
+.reader-bar { display: flex; align-items: center; justify-content: space-between; max-width: 680px; margin: -8px auto 8px; }
+.back-btn {
+  display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 14.5px; font-weight: 600;
+  color: var(--link); background: transparent; border: 0; padding: 8px 8px 8px 0; cursor: pointer;
+}
+
+.reader { max-width: 680px; margin: 0 auto; }
+.reader-title { font-family: var(--serif); font-size: 27px; line-height: 1.5; font-weight: 700; margin: 0 0 8px; }
+.reader-orig { font-size: 14px; color: var(--muted); font-style: italic; line-height: 1.5; margin: 0 0 10px; }
+.reader-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+.reader-img { display: block; width: calc(100% + 32px); margin: 0 -16px 18px; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
+@media (min-width: 600px) { .reader-img { width: 100%; margin: 0 0 18px; border-radius: 10px; } }
+
+.reader-body p { font-size: 17.5px; line-height: 1.95; margin: 0 0 1.1em; overflow-wrap: anywhere; }
+.reader-body h2 { font-family: var(--serif); font-size: 20px; line-height: 1.55; font-weight: 700; margin: 1.6em 0 0.5em; }
+.reader-lead { font-size: 17px; line-height: 1.9; margin: 0 0 14px; }
+.reader-note { font-size: 13.5px; line-height: 1.6; color: var(--muted); background: var(--soft); padding: 10px 12px; border-radius: 8px; margin: 0 0 16px; }
+
+.reader-end { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); }
+.reader-credit { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.reader-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 16px;
+  border-radius: 10px; background: var(--cta-bg); color: var(--cta-ink); font-size: 15.5px; font-weight: 600;
+}
+.reader-cta.inline { display: inline-flex; margin-top: 16px; }
+
+.skel { height: 14px; border-radius: 6px; background: var(--line); margin: 0 0 14px; }
+.skel.short { width: 60%; }
+.skel-title { height: 26px; margin-bottom: 10px; }
+.skel-meta { width: 40%; height: 12px; margin: 14px 0 22px; }
