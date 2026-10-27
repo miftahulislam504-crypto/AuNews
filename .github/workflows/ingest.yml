@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   ingest:
@@ -18,16 +18,46 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+
+      # আগের ডেটা (data ব্রাঞ্চ); ব্রাঞ্চ না থাকলে প্রথমবার, ব্যর্থ হওয়া ঠিক আছে
+      - name: Load previous data
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: data
+          path: data
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install
         working-directory: ingest
         run: npm install --no-audit --no-fund
+
       - name: Ingest
         working-directory: ingest
         run: node run.mjs
         env:
-          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          DATA_DIR: ${{ github.workspace }}/data
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODEL: ${{ vars.GROQ_MODEL }}
+
+      # ইতিহাস জমে রিপো ভারী না হতে প্রতিবার একটিমাত্র কমিট দিয়ে data ব্রাঞ্চ বদলানো হয়
+      - name: Publish data branch
+        working-directory: data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -d .git ] && [ -z "$(git status --porcelain)" ]; then
+            echo "কোনো পরিবর্তন নেই"
+            exit 0
+          fi
+          rm -rf .git
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -q -f origin data
