@@ -1,7 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import type { CSSProperties } from "react";
+import { toBn } from "@/lib/bn";
 import type { FeedItem } from "@/lib/types";
+
+// সোর্স-ভেদে স্থির রঙ (sourceId থেকে hue)
+function hueStyle(id: string): CSSProperties {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
+  return { "--h": h } as CSSProperties;
+}
+
+function initial(name: string): string {
+  return Array.from(name.trim())[0] ?? "•";
+}
+
+function uniqueSources(items: FeedItem[]): { id: string; name: string }[] {
+  const seen = new Map<string, string>();
+  for (const i of items) if (!seen.has(i.sourceId)) seen.set(i.sourceId, i.sourceName);
+  return [...seen].map(([id, name]) => ({ id, name }));
+}
 
 export default function NewsCard({
   item,
@@ -9,18 +28,26 @@ export default function NewsCard({
   onToggle,
   others,
   sourceCount,
+  lead = false,
 }: {
   item: FeedItem;
   saved: boolean;
   onToggle: (item: FeedItem) => void;
   others?: FeedItem[];
   sourceCount?: number;
+  lead?: boolean;
 }) {
   const [imgOk, setImgOk] = useState(true);
   const title = item.titleBn ?? item.title;
   const summary = item.summaryBn ?? (item.titleBn ? "" : item.summary);
+  const showImg = Boolean(item.image) && imgOk;
+  const hasOthers = Boolean(others && others.length > 0);
+  const sources = hasOthers ? uniqueSources([item, ...(others as FeedItem[])]) : [];
+  const n = sourceCount ?? 1;
+  const cls = ["card", lead ? "lead" : "", lead && !showImg ? "noimg" : ""].filter(Boolean).join(" ");
+
   return (
-    <li className="card">
+    <li className={cls}>
       <a href={item.link} target="_blank" rel="noopener noreferrer" className="card-link">
         <div className="card-body">
           <h2 className="card-title">{title}</h2>
@@ -31,12 +58,13 @@ export default function NewsCard({
           ) : null}
           {summary ? <p className="card-summary">{summary}</p> : null}
         </div>
-        {item.image && imgOk ? (
+        {showImg ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={item.image}
+            src={item.image as string}
             alt=""
-            loading="lazy"
+            loading={lead ? "eager" : "lazy"}
+            fetchPriority={lead ? "high" : undefined}
             referrerPolicy="no-referrer"
             className="card-img"
             onError={() => setImgOk(false)}
@@ -45,10 +73,10 @@ export default function NewsCard({
       </a>
       <div className="card-foot">
         <p className="card-meta">
-          <span>{item.sourceName}</span>
-          <span aria-hidden="true">·</span>
-          <time>{item.timeLabel}</time>
-          {sourceCount && sourceCount > 1 ? <span className="badge">{sourceCount}টি সোর্স</span> : null}
+          <span className="src" style={hueStyle(item.sourceId)}>
+            {item.sourceName}
+          </span>
+          <time dateTime={new Date(item.publishedAt).toISOString()}>{item.timeLabel}</time>
           {item.titleBn ? <span className="badge ai">AI অনুবাদ</span> : null}
         </p>
         <button
@@ -69,11 +97,24 @@ export default function NewsCard({
           </svg>
         </button>
       </div>
-      {others && others.length > 0 ? (
+      {hasOthers ? (
         <details className="more">
-          <summary>একই খবর আরও {others.length}টি</summary>
+          <summary>
+            <span className="stack" aria-hidden="true">
+              {sources.slice(0, 4).map((s) => (
+                <span key={s.id} className="stack-dot" style={hueStyle(s.id)}>
+                  {initial(s.name)}
+                </span>
+              ))}
+              {sources.length > 4 ? <span className="stack-dot stack-more">+{toBn(sources.length - 4)}</span> : null}
+            </span>
+            <span>{n > 1 ? `${toBn(n)}টি সোর্সে এই খবর` : `একই খবর আরও ${toBn((others as FeedItem[]).length)}টি`}</span>
+            <svg className="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+              <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </summary>
           <ul className="more-list">
-            {others.map((o) => (
+            {(others as FeedItem[]).map((o) => (
               <li key={o.id}>
                 <a href={o.link} target="_blank" rel="noopener noreferrer">
                   <span className="more-src">{o.sourceName}</span>

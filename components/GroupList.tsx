@@ -8,7 +8,7 @@ export default function GroupList({ groups }: { groups: Group[] }) {
   const { ids, toggle } = useBookmarks();
   return (
     <ul className="list">
-      {groups.map((g) => (
+      {groups.map((g, i) => (
         <NewsCard
           key={g.rep.id}
           item={g.rep}
@@ -16,6 +16,7 @@ export default function GroupList({ groups }: { groups: Group[] }) {
           sourceCount={g.sourceCount}
           saved={ids.has(g.rep.id)}
           onToggle={toggle}
+          lead={i === 0}
         />
       ))}
     </ul>

@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useBookmarks } from "@/lib/bookmarks";
+import { toBn } from "@/lib/bn";
 import { buildHaystack, matches } from "@/lib/search";
 import { formatTimeLabel } from "@/lib/time";
 import type { FeedItem, SlimItem } from "@/lib/types";
@@ -73,7 +74,7 @@ export default function SearchClient() {
         <p className="empty">কিছু পাওয়া যায়নি।</p>
       ) : (
         <>
-          <p className="updated">{results.length}টি ফলাফল{results.length >= LIMIT ? " (প্রথম ১০০টি)" : ""}</p>
+          <p className="updated">{toBn(results.length)}টি ফলাফল{results.length >= LIMIT ? " (প্রথম ১০০টি)" : ""}</p>
           <ul className="list">
             {results.map((i) => (
               <NewsCard key={i.id} item={i} saved={ids.has(i.id)} onToggle={toggle} />
