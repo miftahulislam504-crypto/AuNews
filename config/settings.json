@@ -11,16 +11,12 @@
     "intervalMinutes": 30,
     "maxItemsPerFeedPerRun": 30,
     "summaryMaxChars": 280,
-    "windowDays": 3,
-    "dailyWriteBudget": 15000
+    "windowDays": 3
   },
   "snapshot": {
     "perCategory": 80,
     "all": 150,
     "summaryChars": 160
-  },
-  "firestore": {
-    "collection": "articles"
   },
   "display": {
     "defaultLanguage": "bn",

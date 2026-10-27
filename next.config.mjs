@@ -2,8 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // firebase-admin ওয়েবপ্যাকে বান্ডেল না করে Node থেকেই লোড হবে
-  serverExternalPackages: ["firebase-admin"],
   async headers() {
     return [
       {

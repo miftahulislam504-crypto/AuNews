@@ -1,4 +1,4 @@
-// seen: "id:মিনিট(base36) id:মিনিট ..." — এক স্ট্রিং, যাতে Firestore ইনডেক্স এন্ট্রি না বাড়ে
+// seen: "id:মিনিট(base36) id:মিনিট ..." — এক স্ট্রিং আকারে meta.json এ থাকে
 export function parseSeen(str) {
   const m = new Map();
   for (const part of String(str || "").split(" ")) {
@@ -29,10 +29,10 @@ export function mergeSnapshot(existing, incoming, { cap, cutoffMs }) {
   const byId = new Map();
   for (const it of existing) byId.set(it.id, it);
   for (const it of incoming) if (!byId.has(it.id)) byId.set(it.id, it);
-  const items = [...byId.values()]
-    .filter((i) => i.publishedAt >= cutoffMs)
-    .sort((a, b) => b.publishedAt - a.publishedAt)
-    .slice(0, cap);
+  const union = [...byId.values()];
+  const fresh = union.filter((i) => i.publishedAt >= cutoffMs);
+  const expired = union.length - fresh.length;
+  const items = fresh.sort((a, b) => b.publishedAt - a.publishedAt).slice(0, cap);
   const same = items.length === existing.length && items.every((it, i) => it.id === existing[i].id);
-  return { items, changed: !same };
+  return { items, changed: !same, expired };
 }
