@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # আগের ডেটা (data ব্রাঞ্চ); ব্রাঞ্চ না থাকলে প্রথমবার, ব্যর্থ হওয়া ঠিক আছে
+      # (প্রথম রানে এখানকার লাল "git exit code 1" অ্যানোটেশন স্বাভাবিক; রান সফলই ধরা হয়)
       - name: Load previous data
         uses: actions/checkout@v4
         continue-on-error: true
@@ -49,6 +50,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # data ব্রাঞ্চে শুধু JSON থাকে, অ্যাপ কোড নেই; তাই এখানে Vercel ডিপ্লয় বন্ধ রাখা হয়
+          # (নইলে প্রতি পুশে Vercel বিল্ড করতে গিয়ে "Couldn't find any pages or app directory" দিয়ে ফেল করে)
+          printf '%s\n' '{ "git": { "deploymentEnabled": { "data": false } } }' > vercel.json
           if [ -d .git ] && [ -z "$(git status --porcelain)" ]; then
             echo "কোনো পরিবর্তন নেই"
             exit 0
