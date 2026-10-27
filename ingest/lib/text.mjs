@@ -5,8 +5,35 @@ const ENTITIES = {
   hellip: "…", ndash: "–", mdash: "—", lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”",
 };
 
+// rss-parser (xml2js) অ্যাট্রিবিউটসহ ট্যাগকে স্ট্রিং নয়, অবজেক্ট ({ _: "টেক্সট", $: {...} }) হিসেবে দেয়;
+// এমনকি prototype-হীন অবজেক্টও হতে পারে, যেখানে String(obj) সরাসরি TypeError ছোঁড়ে।
+// তাই যেকোনো ফিড-ভ্যালুকে নিরাপদে স্ট্রিং বানাতে এটি ব্যবহার করুন।
+const TEXT_KEYS = ["_", "#text", "__text", "__cdata", "$t"];
+
+export function toText(v, depth = 0) {
+  if (v == null) return "";
+  const t = typeof v;
+  if (t === "string") return v;
+  if (t === "number" || t === "boolean" || t === "bigint") return String(v);
+  if (t !== "object" || depth > 4) return "";
+  if (Array.isArray(v)) {
+    for (const x of v) {
+      const s = toText(x, depth + 1);
+      if (s) return s;
+    }
+    return "";
+  }
+  for (const k of TEXT_KEYS) {
+    if (k in v) {
+      const s = toText(v[k], depth + 1);
+      if (s) return s;
+    }
+  }
+  return "";
+}
+
 export function decodeEntities(s) {
-  return String(s).replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
+  return toText(s).replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
     if (e[0] === "#") {
       const code = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
       try { return String.fromCodePoint(code); } catch { return m; }
@@ -16,8 +43,9 @@ export function decodeEntities(s) {
 }
 
 export function stripHtml(html) {
-  if (!html) return "";
-  let s = String(html)
+  const raw = toText(html);
+  if (!raw) return "";
+  let s = raw
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
     .replace(/<br\s*\/?>/gi, " ")
@@ -48,9 +76,11 @@ const TRACKING = /^(utm_|fbclid$|gclid$|mc_|ref$|ref_src$|igshid$|cmpid$)/i;
 
 // { link: দেখানোর লিংক, key: ডুপ্লিকেট চেনার ক্যানোনিক্যাল কী }
 export function normalizeUrl(raw) {
-  if (!raw) return null;
+  let text = toText(raw).trim();
+  if (!text) text = toText((Array.isArray(raw) ? raw[0] : raw)?.$?.href).trim(); // <link href="..."/> ধরন
+  if (!text) return null;
   let u;
-  try { u = new URL(String(raw).trim()); } catch { return null; }
+  try { u = new URL(text); } catch { return null; }
   if (u.protocol !== "http:" && u.protocol !== "https:") return null;
   u.hash = "";
   for (const k of [...u.searchParams.keys()]) if (TRACKING.test(k)) u.searchParams.delete(k);
@@ -74,8 +104,8 @@ export function extractImage(item, baseLink) {
   if (mc?.url && (mc.medium === "image" || String(mc.type || "").startsWith("image") || (!mc.medium && !mc.type && IMG_EXT.test(mc.url)))) cands.push(mc.url);
   const mt = first(item.mediaThumbnail)?.$;
   if (mt?.url) cands.push(mt.url);
-  const html = item.contentEncoded || item.content || item.summary || "";
-  const m = typeof html === "string" ? html.match(/<img[^>]+src=["']([^"']+)["']/i) : null;
+  const html = toText(item.contentEncoded) || toText(item.content) || toText(item.summary);
+  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
   if (m && !m[1].startsWith("data:")) cands.push(decodeEntities(m[1]));
   for (const c of cands) {
     try {
