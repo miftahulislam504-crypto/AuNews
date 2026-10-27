@@ -53,9 +53,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </header>
         <main className="container">{children}</main>
         <footer className="footer">
-          <p className="footer-tag">{settings.site.tagline}</p>
-          <p className="footer-note">
-            খবরের স্বত্ব সংশ্লিষ্ট সোর্সের। প্রতিটি খবরের নিচে মূল লিংক দেওয়া আছে।
+          <p className="footer-tag" lang="en">
+            {settings.site.taglineEn}
+          </p>
+          <p className="footer-note" lang="en">
+            Each story belongs to its original source. A link to the original is provided with every story.
           </p>
         </footer>
         <ServiceWorkerRegister />
