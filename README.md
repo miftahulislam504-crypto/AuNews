@@ -39,7 +39,8 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 - `retention`: `days: 7`; `mode: "rolling"` (প্রতিটি খবর ৭ দিন পর বাদ) বা `"weekly_wipe"` (প্রতি ৭ দিনে সব একসাথে)।
 - `ingest.windowDays: 3`: শুধু শেষ ৩ দিনের খবর নেওয়া হয়।
 - `cluster.threshold: 0.45`: একই খবর গ্রুপ করার সংবেদনশীলতা।
-- `snapshot`: ফিডে কয়টি খবর রাখা হবে (ক্যাটাগরি প্রতি ৮০, সর্বশেষ ১৫০)।
+- `snapshot`: ফিডে কয়টি খবর রাখা হবে (ক্যাটাগরি প্রতি ৮০, সর্বশেষ ৪০০; হোমে সর্বশেষ ১৫০টি দেখায়, বাকিটা ট্রেন্ডিং-এর জন্য)।
+- `cluster.trendingMinSources: 2`: ট্রেন্ডিং-এ আসতে কমপক্ষে কয়টি আলাদা সোর্সে খবরটি আসতে হবে।
 
 ## ফোল্ডার
 ```
