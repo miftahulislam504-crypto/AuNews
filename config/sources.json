@@ -14,7 +14,7 @@
     "scope": "bd",
     "lang": "bn",
     "category": "national",
-    "url": "https://www.banglatribune.com/feed",
+    "url": "https://www.banglatribune.com/feed/",
     "enabled": true
   },
   {
@@ -33,7 +33,10 @@
     "lang": "bn",
     "category": "national",
     "url": "https://www.daily-bangladesh.com/rss/rss.xml",
-    "enabled": true
+    "enabled": true,
+    "alts": [
+      "https://www.daily-bangladesh.com/feed/"
+    ]
   },
   {
     "id": "jagonews24",
@@ -59,9 +62,10 @@
     "scope": "bd",
     "lang": "bn",
     "category": "national",
-    "url": "https://www.ittefaq.com.bd/rss/rss.xml",
+    "url": "https://www.ittefaq.com.bd/feed/",
     "alts": [
-      "https://www.ittefaq.com.bd/feed"
+      "https://www.ittefaq.com.bd/feed",
+      "https://www.ittefaq.com.bd/rss/rss.xml"
     ],
     "enabled": true
   },
@@ -109,7 +113,8 @@
     "category": "national",
     "url": "https://www.jugantor.com/rss.xml",
     "alts": [
-      "https://www.jugantor.com/feed"
+      "https://www.jugantor.com/feed",
+      "https://www.jugantor.com/feed/"
     ],
     "enabled": true
   },
@@ -131,8 +136,9 @@
     "scope": "bd",
     "lang": "en",
     "category": "national",
-    "url": "https://www.dhakatribune.com/feed",
+    "url": "https://www.dhakatribune.com/feed/",
     "alts": [
+      "https://www.dhakatribune.com/feed",
       "https://www.dhakatribune.com/rss.xml"
     ],
     "enabled": true
@@ -179,7 +185,8 @@
     "category": "economy",
     "url": "https://thefinancialexpress.com.bd/rss.xml",
     "alts": [
-      "https://thefinancialexpress.com.bd/feed"
+      "https://thefinancialexpress.com.bd/feed",
+      "https://thefinancialexpress.com.bd/feed/"
     ],
     "enabled": true
   },
@@ -486,4 +493,4 @@
     ],
     "enabled": true
   }
-]
+    ]
