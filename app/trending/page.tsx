@@ -3,7 +3,7 @@ import GroupList from "@/components/GroupList";
 import { getTrending } from "@/lib/feed";
 
 export const revalidate = 600;
-export const metadata: Metadata = { title: "ট্রেন্ডিং" };
+export const metadata: Metadata = { title: "ট্রেন্ডিং", robots: { index: false, follow: true } };
 
 export default async function TrendingPage() {
   const { groups, updatedLabel } = await getTrending();
