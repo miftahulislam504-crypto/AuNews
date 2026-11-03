@@ -7,6 +7,7 @@ import CategoryTabs from "@/components/CategoryTabs";
 import DateLine from "@/components/DateLine";
 import HeaderActions from "@/components/HeaderActions";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // UI লেখা: Hind Siliguri, শিরোনাম: Noto Serif Bengali (next/font নিজেই হোস্ট করে, বাইরের রিকোয়েস্ট লাগে না)
@@ -24,8 +25,18 @@ const serif = Noto_Serif_Bengali({
 });
 
 export const metadata: Metadata = {
-  title: { default: settings.site.name, template: `%s | ${settings.site.name}` },
+  metadataBase: new URL(SITE_URL),
+  title: { default: `${settings.site.name} — ${settings.site.tagline}`, template: `%s | ${settings.site.name}` },
   description: settings.site.tagline,
+  applicationName: settings.site.name,
+  openGraph: { type: "website", siteName: settings.site.name, locale: "bn_BD", description: settings.site.tagline },
+  twitter: { card: "summary" },
+  alternates: { types: { "application/rss+xml": "/feed.xml" } },
+  // Search Console / Bing Webmaster যাচাইয়ের কোড Vercel → Environment Variables এ দিন
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
 };
 
 export const viewport: Viewport = {
@@ -58,6 +69,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </p>
           <p className="footer-note" lang="en">
             Each story belongs to its original source. A link to the original is provided with every story.
+          </p>
+          <p className="footer-note">
+            <Link href="/about">আমাদের সম্পর্কে</Link> · <Link href="/ai">এআই ব্রিফ</Link> · <a href="/feed.xml">RSS</a>
           </p>
         </footer>
         <ServiceWorkerRegister />

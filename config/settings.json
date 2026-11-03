@@ -2,7 +2,13 @@
   "site": {
     "name": "AuNews",
     "tagline": "বাংলাদেশ ও বিশ্বের সব খবর, এক জায়গায়",
-    "taglineEn": "All the news from Bangladesh and the world, in one place"
+    "taglineEn": "All the news from Bangladesh and the world, in one place",
+    "url": "https://aunews.vercel.app",
+    "contact": "",
+    "social": {
+      "facebook": "",
+      "telegram": ""
+    }
   },
   "retention": {
     "days": 7,
@@ -47,5 +53,53 @@
     "externalSources": [
       "nyt-world"
     ]
+  },
+  "digest": {
+    "enabled": true,
+    "model": "openai/gpt-oss-20b",
+    "windowHours": 24,
+    "minSources": 3,
+    "minSourcesWithText": 2,
+    "maxSources": 3,
+    "maxCharsPerSource": 1400,
+    "minCharsPerSource": 250,
+    "maxPerRun": 2,
+    "maxCandidatesPerRun": 6,
+    "dailyMax": 20,
+    "dailyTokenBudget": 150000,
+    "tokensPerMinute": 8000,
+    "retryAfterHours": 3,
+    "keep": 60
+  },
+  "info": {
+    "weather": {
+      "enabled": true,
+      "name": "ঢাকা",
+      "lat": 23.81,
+      "lon": 90.41
+    },
+    "fx": {
+      "enabled": true,
+      "base": "USD",
+      "quote": "BDT"
+    }
+  },
+  "daily": {
+    "enabled": true,
+    "hourDhaka": 7,
+    "minStories": 3,
+    "maxStories": 10,
+    "minSources": 2,
+    "windowHours": 24,
+    "maxWorld": 4,
+    "keep": 7
+  },
+  "telegram": {
+    "enabled": true,
+    "maxAgeHours": 6,
+    "maxPerRun": 3,
+    "dailyMax": 25,
+    "delayMs": 1500,
+    "maxTries": 3
   }
 }

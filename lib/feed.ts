@@ -80,3 +80,10 @@ export async function getItem(id: string): Promise<FeedItem | null> {
     return null;
   }
 }
+
+// একই ঘটনার (clusterId) অন্য সোর্সের খবর — খবরের পেজে "অন্য সোর্সে" তালিকার জন্য
+export async function getRelated(item: { id: string; clusterId?: string }): Promise<FeedItem[]> {
+  if (!item.clusterId) return [];
+  const { items } = await getFeed("all");
+  return items.filter((i) => i.clusterId === item.clusterId && i.id !== item.id);
+}

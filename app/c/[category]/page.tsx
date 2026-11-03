@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
   const c = categories.find((x) => x.id === category);
-  return { title: c ? c.bn : undefined };
+  return { title: c ? c.bn : undefined, robots: { index: false, follow: true } };
 }
 
 export default async function CategoryPage({ params }: Props) {

@@ -21,6 +21,61 @@
 ### রিপো Private হলে টোকেন
 GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token: Repository access = শুধু AuNews, Permissions → Contents = **Read-only**। টোকেনটি Vercel এ `DATA_GITHUB_TOKEN` নামে বসান।
 
+## এআই ব্রিফ (নতুন) — সাইট নিজে নতুন তথ্য গুছিয়ে পোস্ট করে
+`GROQ_API_KEY` থাকলেই চালু। প্রতি ৩০ মিনিটের ইনজেস্টের শেষে:
+1. যে ঘটনা **৩টি বা বেশি আলাদা সোর্সে** গত ২৪ ঘণ্টায় এসেছে (গ্রুপিং আগের মতোই), সেটি প্রার্থী হয়।
+2. সেই সোর্সগুলোর পেজ থেকে লেখা এনে (সর্বোচ্চ ৩টি, প্রতিটি থেকে ১৪০০ অক্ষর) এআই-কে দেওয়া হয়। কমপক্ষে ২টি সোর্সের লেখা না পেলে ব্রিফ বানানো হয় না।
+3. এআই নিজের ভাষায় বাংলায় লেখে: শিরোনাম, ভূমিকা, ৩–৫টি মূল তথ্য (প্রতিটির পাশে সোর্স নম্বর), প্রয়োজনে পটভূমি ও "সূত্রে অমিল"।
+4. **যাচাই** (ব্যর্থ হলে প্রকাশ হয় না): সোর্সে নেই এমন সংখ্যা থাকলে বাদ; সোর্স নম্বরহীন পয়েন্ট বাদ; সোর্স থেকে হুবহু অনুলিপি বাদ; বাংলা নয় এমন লেখা বাদ।
+5. ফল যায় `data` ব্রাঞ্চের `feeds/digest.json` এ। সাইটে দেখা যায় হোমের উপরে, `/ai` পেজে এবং `/p/<id>` এ।
+- রান Summary তে দেখাবে কয়টি ব্রিফ হলো, কয়টি যাচাইয়ে বাতিল (কারণসহ)।
+- **সীমা** (`config/settings.json` → `digest`): রান প্রতি ২টি, দিনে ২০টি, দিনে ১,৫০,০০০ টোকেন। এটি অনুবাদের চেয়ে আলাদা মডেল (`openai/gpt-oss-20b`) ব্যবহার করে, কারণ Groq এর সীমা মডেল-ভিত্তিক; তাই অনুবাদের কোটা কমে না। মডেল বদলাতে GitHub → Settings → Variables এ `GROQ_DIGEST_MODEL` দিন (যেমন `llama-3.3-70b-versatile`; এর দৈনিক সীমা ১,০০,০০০ টোকেন, তাই `dailyTokenBudget` কমিয়ে ৮০,০০০ করুন)।
+- বন্ধ করতে: `digest.enabled` = `false`।
+
+## আজকের তথ্য স্ট্রিপ (নতুন)
+হোমের উপরে ঢাকার আবহাওয়া (Open-Meteo) ও ডলারের দাম (ExchangeRate-API)। কোনো key লাগে না। `config/settings.json` → `info` এ বন্ধ/শহর বদল করা যায়।
+- Open-Meteo **শুধু অবাণিজ্যিক** ব্যবহারে ফ্রি। সাইটে বিজ্ঞাপন/বিক্রি যোগ করলে `info.weather.enabled` = `false` করুন বা তাদের পেইড প্ল্যান নিন।
+- ডলারের দামের নিচে "Rates By Exchange Rate API" লিংক থাকা তাদের শর্ত; সরাবেন না।
+
+## নতুন সোর্স যোগ (ওয়েবসাইট / ফেসবুক)
+- **যেকোনো ওয়েবসাইট**: `config/sources.json` এ আরেকটি RSS ফিড বসান (`id`, `name`, `scope`, `lang`, `category`, `url`)। তারপর Actions → Validate feeds চালিয়ে দেখুন ফিডটি কাজ করছে কিনা।
+- **ফেসবুক পেজ**: ফেসবুক স্ক্র্যাপিং তাদের নীতির বিরুদ্ধে এবং দ্রুত ব্লক হয়, তাই এতে স্ক্র্যাপার নেই। দুটি বৈধ পথ: (ক) পেজটির নিজস্ব ওয়েবসাইটের RSS (বেশিরভাগ নিউজ পেজের পোস্ট ওয়েবসাইটেও থাকে); (খ) তৃতীয় পক্ষের ফিড-ব্রিজ সার্ভিস (যেমন rss.app) যে পেজের RSS URL দেয়, সেটি এখানে সাধারণ সোর্স হিসেবে বসানো। এসব সার্ভিসের ফ্রি সীমা ও শর্ত তাদের সাইটে দেখে নিন।
+- **অ্যাপ**: মোবাইল অ্যাপের ভেতরের ডেটা বাইরে থেকে পড়ার বৈধ উপায় নেই। অ্যাপটির ওয়েব সংস্করণে RSS থাকলে সেটিই সোর্স।
+
+## আজকের বড় খবর (নতুন)
+প্রতিদিন ঢাকার সময় সকাল ৭টার পর প্রথম রানে একবার তৈরি হয়; সাইটে `/daily` ও হোমের উপরের ব্যানারে দেখা যায়।
+- বাছাই: গত ২৪ ঘণ্টায় যে ঘটনা সবচেয়ে বেশি আলাদা সোর্সে এসেছে (কমপক্ষে ২টি), সর্বোচ্চ ১০টি; এর মধ্যে বিশ্ব-খবর সর্বোচ্চ ৪টি।
+- **এআই লাগে না**, তাই কোনো তথ্য বানানোর ঝুঁকি নেই। ঘটনাটির এআই ব্রিফ থাকলে তার শিরোনাম ও ভূমিকা দেখায়; না থাকলে সোর্সের বাংলা শিরোনাম ও মূল লিংক। বাংলা শিরোনাম নেই এমন ঘটনা বাদ।
+- ৩টির কম ঘটনা পেলে সেদিন তৈরি হয় না (পরের রানে আবার চেষ্টা)। সেটিং: `config/settings.json` → `daily`।
+- শেষ ৭ দিনের তালিকা থাকে (`/daily/২০২৬-১১-০৩` ধরনের লিংক)। এই পেজগুলো `noindex`, কারণ এগুলো অন্য সাইটের শিরোনামের তালিকা; ভেতরের এআই ব্রিফগুলো নিজেদের পেজে ইনডেক্স হয়।
+
+## টেলিগ্রাম চ্যানেলে অটো-পোস্ট (নতুন)
+চ্যানেলে যায়: (১) সকালে "আজকের বড় খবর", (২) নতুন এআই ব্রিফ (৬ ঘণ্টার মধ্যে তৈরি হলে; রান প্রতি সর্বোচ্চ ৩টি, দিনে মোট ২৫টি)। রাউন্ডআপে থাকা ব্রিফ আলাদা করে আবার যায় না।
+সেটআপ:
+1. টেলিগ্রামে **@BotFather** → `/newbot` → নাম ও username দিন (শেষে `bot` থাকতে হবে)। যে **টোকেন** দেবে সেটি কাউকে দেখাবেন না।
+2. একটি **পাবলিক চ্যানেল** খুলুন, username দিন (যেমন `@aunews_bd`)।
+3. চ্যানেল → Administrators → Add Administrator → আপনার বট → **Post messages** অনুমতি দিন।
+4. GitHub রিপো → Settings → Secrets and variables → Actions:
+   - **Secrets** এ `TELEGRAM_BOT_TOKEN` = বটের টোকেন
+   - **Variables** এ `TELEGRAM_CHAT_ID` = `@aunews_bd` (আপনার চ্যানেলের username)
+5. **আগে ড্রাই-রান**: Variables এ `TELEGRAM_DRY_RUN` = `1` দিয়ে Actions → Ingest news → Run workflow। Summary তে বার্তাগুলো কেমন হবে দেখা যাবে, কিছু পাঠানো হবে না। ঠিক লাগলে ওই ভ্যারিয়েবলটি মুছে দিন; তখন থেকে সত্যিকারের পোস্ট শুরু।
+- রান Summary তে "টেলিগ্রাম" লাইনে ফল ও ত্রুটি দেখাবে (বট অ্যাডমিন না হলে, চ্যানেল না মিললে ইত্যাদি)। এমন ত্রুটিতে ৬ ঘণ্টা বিরতি দিয়ে আবার চেষ্টা করে।
+- টোকেন ফাঁস হলে BotFather → `/revoke`, নতুন টোকেন Secrets এ বসান।
+- বন্ধ করতে: `telegram.enabled` = `false` বা Secret মুছুন। সেটিং: `config/settings.json` → `telegram`।
+- সাইটের ঠিকানা বদলালে Variables এ `SITE_URL` দিন (না দিলে `settings.json` এর `site.url`)।
+
+## গুগলে আনা (Search Console)
+কোড দিকটা তৈরি: `sitemap.xml`, `robots.txt`, শেয়ার-প্রিভিউ ট্যাগ, `canonical`, ব্রিফে NewsArticle ডেটা, `/about`, `/feed.xml`। আপনাকে শুধু যাচাই করাতে হবে:
+1. search.google.com/search-console → **Add property** → **URL prefix** → `https://aunews.vercel.app`
+2. যাচাইয়ের পদ্ধতি **HTML tag** বেছে `content="..."` এর ভেতরের কোডটি কপি করুন।
+3. Vercel → Project → Settings → Environment Variables → নাম `GOOGLE_SITE_VERIFICATION`, মান ওই কোড → Save → **Redeploy** → Search Console এ Verify।
+4. Search Console → **Sitemaps** → `sitemap.xml` জমা দিন।
+5. **URL inspection** এ হোম পেজ ও একটি `/p/…` ব্রিফের লিংক দিয়ে "Request indexing"।
+- Bing: Bing Webmaster Tools এ একইভাবে; কোডটি `BING_SITE_VERIFICATION` নামে দিন।
+- `config/settings.json` → `site.contact` এ আপনার ইমেইল, `site.social` এ ফেসবুক/টেলিগ্রাম লিংক দিন; `/about` এ দেখাবে।
+- কাস্টম ডোমেইন নিলে Vercel এ `NEXT_PUBLIC_SITE_URL` দিন এবং পুরনো ঠিকানা থেকে নতুনে redirect রাখুন।
+- ইচ্ছা করে noindex রাখা: `/n/*` (অন্যের পুরো লেখা), ক্যাটাগরি, ট্রেন্ডিং, সার্চ। কারণ এগুলো অন্য সাইটের লেখার তালিকা। মৌলিক লেখা বাড়লে ক্যাটাগরি পেজের `robots` সরিয়ে দিন।
+
 ## ঐচ্ছিক
 - **AI অনুবাদ** (ইংরেজি খবরের শিরোনাম বাংলায়): GitHub Secret `GROQ_API_KEY`। সীমা ও বিস্তারিত `config/settings.json` এর `ai` অংশে।
 - **ফিড যাচাই**: Actions → Validate feeds → Run workflow। Summary তে ফেল করা ফিড দেখাবে।
@@ -41,12 +96,16 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 - `cluster.threshold: 0.45`: একই খবর গ্রুপ করার সংবেদনশীলতা।
 - `snapshot`: ফিডে কয়টি খবর রাখা হবে (ক্যাটাগরি প্রতি ৮০, সর্বশেষ ৪০০; হোমে সর্বশেষ ১৫০টি দেখায়, বাকিটা ট্রেন্ডিং-এর জন্য)।
 - `cluster.trendingMinSources: 2`: ট্রেন্ডিং-এ আসতে কমপক্ষে কয়টি আলাদা সোর্সে খবরটি আসতে হবে।
+- `digest.*`: এআই ব্রিফের সীমা ও শর্ত (`minSources`, `maxPerRun`, `dailyMax`, `dailyTokenBudget`, `keep` ইত্যাদি)।
+- `info.*`: আজকের তথ্য স্ট্রিপ (আবহাওয়া, ডলার)।
+- `daily.*`: আজকের বড় খবর (`hourDhaka`, `maxStories`, `minSources`, `maxWorld`)।
+- `telegram.*`: টেলিগ্রাম পোস্টের সীমা (`maxAgeHours`, `maxPerRun`, `dailyMax`)।
 
 ## ফোল্ডার
 ```
 .github/workflows/   ingest.yml (প্রতি ৩০ মিনিট), validate-feeds.yml (হাতে চালানো)
-app/ components/ lib/ public/   ওয়েবসাইট (Next.js)
-ingest/              ইনজেস্ট + টেস্ট
+app/ components/ lib/ public/   ওয়েবসাইট (Next.js); /ai ও /p/[id] = এআই ব্রিফ, /daily = আজকের বড় খবর
+ingest/              ইনজেস্ট + টেস্ট (lib/digest.mjs = এআই ব্রিফ)
 config/              categories, sources, settings
 scripts/             validate-feeds.mjs
 vercel.json          data ব্রাঞ্চে Vercel বিল্ড বন্ধ

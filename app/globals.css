@@ -280,3 +280,72 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .skel.short { width: 60%; }
 .skel-title { height: 26px; margin-bottom: 10px; }
 .skel-meta { width: 40%; height: 12px; margin: 14px 0 22px; }
+
+/* ---------- আজকের তথ্য স্ট্রিপ ---------- */
+.info { display: grid; gap: 10px; margin: 0 0 18px; }
+@media (min-width: 600px) { .info { grid-template-columns: 1fr 1fr; } }
+.info-cell { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.info-k { font-size: 13px; font-weight: 600; color: var(--muted); }
+.info-v { font-family: var(--serif); font-size: 22px; font-weight: 700; line-height: 1.3; }
+.info-s { flex-basis: 100%; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.info-s a { text-decoration: underline; }
+
+/* ---------- এআই ব্রিফ ---------- */
+.section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 4px; }
+.section-head h2 { font-family: var(--serif); font-size: 20px; line-height: 1.4; margin: 0; }
+.section-head a { font-size: 13.5px; font-weight: 600; color: var(--link); }
+.home-digests { margin: 0 0 22px; padding: 4px 14px 2px; border-radius: 12px; background: var(--soft); }
+
+.dlist { list-style: none; margin: 0; padding: 0; }
+.dcard { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.dcard:last-child { border-bottom: 0; }
+.home-digests .dcard { border-bottom-color: color-mix(in srgb, var(--link) 18%, transparent); }
+.dcard-kicker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; font-size: 12.5px; color: var(--muted); }
+.dcard-title { font-family: var(--serif); font-size: 18px; line-height: 1.55; font-weight: 700; margin: 0 0 4px; }
+.dcard-lead { font-size: 14.5px; line-height: 1.7; color: var(--muted); margin: 0 0 4px; }
+.dcard-meta { font-size: 12.5px; color: var(--muted); margin: 0; }
+.dcard.compact .dcard-title { font-size: 16.5px; margin-bottom: 2px; }
+@media (hover: hover) { .dcard-link:hover .dcard-title { color: var(--link); } }
+
+.digest-h { font-family: var(--serif); font-size: 19px; line-height: 1.5; font-weight: 700; margin: 1.6em 0 0.5em; }
+.digest-points { margin: 0; padding: 0 0 0 1.2em; display: grid; gap: 10px; }
+.digest-points li { font-size: 17px; line-height: 1.85; padding-left: 2px; }
+.refs { white-space: nowrap; }
+.ref {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; margin-right: 3px;
+  font-size: 11.5px; font-weight: 600; line-height: 1; border-radius: 6px; color: var(--link); background: var(--soft); vertical-align: 2px;
+}
+.digest-warn { font-size: 15px; line-height: 1.8; margin: 16px 0 0; padding: 10px 12px; border-radius: 8px; border-left: 4px solid var(--gold); background: var(--soft); }
+.digest-bg { font-size: 16.5px; line-height: 1.9; margin: 0; }
+.digest-sources { margin: 0; padding: 0 0 0 1.4em; display: grid; gap: 10px; }
+.digest-sources a { display: block; }
+.digest-src-title { display: block; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+@media (hover: hover) { .digest-sources a:hover .digest-src-title { color: var(--link); } }
+.digest-link { display: flex; align-items: center; gap: 10px; margin: 22px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--soft); font-size: 15px; font-weight: 600; color: var(--link); }
+.related { margin: 22px 0 0; }
+
+/* ---------- শেয়ার / আমাদের সম্পর্কে ---------- */
+.share-row { display: flex; align-items: center; gap: 10px; margin: 22px 0 0; }
+.share-btn {
+  display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 15px; font-weight: 600;
+  padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.share-btn:active { background: var(--soft); }
+.share-msg { font-size: 13px; color: var(--muted); }
+.about p { font-size: 16.5px; line-height: 1.9; margin: 0 0 1em; }
+.footer-note a { text-decoration: underline; }
+
+/* ---------- আজকের বড় খবর ---------- */
+.daily-banner { display: flex; flex-direction: column; gap: 2px; margin: 0 0 18px; padding: 12px 14px; border-radius: 12px; background: var(--soft); border-left: 4px solid var(--gold); }
+.daily-banner strong { font-family: var(--serif); font-size: 17px; line-height: 1.5; }
+.daily-banner span { font-size: 13px; color: var(--muted); }
+.daily-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.daily-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.daily-item:last-child { border-bottom: 0; }
+.daily-rank { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); font-weight: 700; font-size: 15px; color: var(--link); }
+.daily-title { font-family: var(--serif); font-size: 18px; line-height: 1.6; font-weight: 700; display: block; }
+@media (hover: hover) { .daily-title:hover { color: var(--link); } }
+.daily-lead { font-size: 14.5px; line-height: 1.7; color: var(--muted); margin: 4px 0 0; }
+.daily-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; font-size: 12.5px; color: var(--muted); }
+.daily-prev { margin: 20px 0 0; font-size: 14px; color: var(--muted); }
+.daily-prev a { margin-left: 10px; text-decoration: underline; }

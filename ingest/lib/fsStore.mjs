@@ -37,11 +37,37 @@ export function createFsStore(dir) {
       await mkdir(feedsDir, { recursive: true });
       for (const [id, data] of map) await writeFile(path.join(feedsDir, `${id}.json`), JSON.stringify(data));
     },
+    // এআই ব্রিফ: feeds/digest.json (items, usage, tried, pausedUntil)
+    async loadDigests() {
+      return (await readJson(path.join(feedsDir, "digest.json"))) ?? {};
+    },
+    async saveDigests(data) {
+      await mkdir(feedsDir, { recursive: true });
+      await writeFile(path.join(feedsDir, "digest.json"), JSON.stringify(data));
+    },
+    // আজকের বড় খবর: feeds/daily.json
+    async loadDaily() {
+      return (await readJson(path.join(feedsDir, "daily.json"))) ?? {};
+    },
+    async saveDaily(data) {
+      await mkdir(feedsDir, { recursive: true });
+      await writeFile(path.join(feedsDir, "daily.json"), JSON.stringify(data));
+    },
+    // টেলিগ্রামে কী কী পোস্ট হয়েছে: feeds/telegram.json
+    async loadTelegram() {
+      return (await readJson(path.join(feedsDir, "telegram.json"))) ?? {};
+    },
+    async saveTelegram(data) {
+      await mkdir(feedsDir, { recursive: true });
+      await writeFile(path.join(feedsDir, "telegram.json"), JSON.stringify(data));
+    },
     // সব স্ন্যাপশট মোছে; মোছা ফাইলের সংখ্যা ফেরত দেয়
+    // (digest/daily/telegram এর নিজস্ব মেয়াদ আছে; মুছলে টেলিগ্রামে একই পোস্ট আবার যেত)
     async wipe() {
       let n = 0;
       try {
         for (const f of await readdir(feedsDir)) {
+          if (f === "digest.json" || f === "daily.json" || f === "telegram.json") continue;
           await rm(path.join(feedsDir, f));
           n++;
         }

@@ -38,3 +38,59 @@ export interface SlimItem {
   tb?: string; // titleBn
   sb?: string; // summaryBn
 }
+
+// এআই ব্রিফ (data ব্রাঞ্চের feeds/digest.json)
+export interface DigestPoint {
+  t: string; // একটি তথ্য
+  s: number[]; // সমর্থনকারী সোর্স নম্বর
+}
+
+export interface DigestSource {
+  n: number;
+  name: string;
+  link: string;
+  title: string;
+}
+
+export interface Digest {
+  id: string;
+  clusterId: string;
+  category: string;
+  scope: Scope;
+  headline: string;
+  lead: string;
+  points: DigestPoint[];
+  background: string;
+  conflict: string;
+  sources: DigestSource[];
+  sourceCount: number;
+  image: string | null;
+  publishedAt: number; // ms (ঘটনার সবচেয়ে নতুন খবরের সময়)
+  createdAt: number; // ms (ব্রিফ লেখার সময়)
+  model: string;
+}
+
+export interface DigestView extends Digest {
+  timeLabel: string;
+}
+
+// আজকের বড় খবর (data ব্রাঞ্চের feeds/daily.json)
+export interface DailyStory {
+  rank: number;
+  clusterId: string;
+  headline: string;
+  lead: string;
+  sourceCount: number;
+  digestId: string | null; // এআই ব্রিফ থাকলে তার id
+  link: string | null; // ব্রিফ না থাকলে মূল সোর্সের লিংক
+  sourceName: string;
+  scope: Scope;
+  category: string;
+}
+
+export interface DailyEdition {
+  date: string; // YYYY-MM-DD (ঢাকা)
+  label: string; // "৩ নভেম্বর ২০২৬"
+  generatedAt: number;
+  stories: DailyStory[];
+}

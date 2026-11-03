@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import SavedClient from "@/components/SavedClient";
 
-export const metadata: Metadata = { title: "সংরক্ষিত" };
+export const metadata: Metadata = { title: "সংরক্ষিত", robots: { index: false, follow: false } };
 
 export default function SavedPage() {
   return (

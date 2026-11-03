@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReaderBar from "@/components/ReaderBar";
 import ReaderImage from "@/components/ReaderImage";
 import { fetchArticle } from "@/lib/article";
-import { getItem } from "@/lib/feed";
+import { getDigestForCluster } from "@/lib/digest";
+import { getItem, getRelated } from "@/lib/feed";
 import { hueStyle, opensInApp } from "@/lib/reader";
 
 export const revalidate = 1800;
@@ -22,7 +24,11 @@ export default async function ArticlePage({ params }: Props) {
   const item = await getItem(id);
   if (!item) notFound();
 
-  const article = opensInApp(item) ? await fetchArticle(item.link) : null;
+  const [article, related, digest] = await Promise.all([
+    opensInApp(item) ? fetchArticle(item.link) : Promise.resolve(null),
+    getRelated(item),
+    getDigestForCluster(item.clusterId),
+  ]);
   const title = item.titleBn ?? item.title;
   const summary = item.summaryBn ?? (item.titleBn ? "" : item.summary);
 
@@ -58,6 +64,29 @@ export default async function ArticlePage({ params }: Props) {
             <p className="reader-note">পুরো খবর এখানে আনা যায়নি। মূল সাইটে গিয়ে পড়ুন।</p>
           </>
         )}
+
+        {digest ? (
+          <Link href={`/p/${digest.id}`} className="digest-link">
+            <span className="badge ai">এআই ব্রিফ</span>
+            <span>এই ঘটনার মূল তথ্য এক নজরে</span>
+          </Link>
+        ) : null}
+
+        {related.length > 0 ? (
+          <section className="related" aria-label="একই ঘটনা অন্য সোর্সে">
+            <h2 className="digest-h">একই ঘটনা অন্য সোর্সে</h2>
+            <ul className="more-list">
+              {related.slice(0, 8).map((o) => (
+                <li key={o.id}>
+                  <a href={o.link} target="_blank" rel="noopener noreferrer">
+                    <span className="more-src">{o.sourceName}</span>
+                    {o.titleBn ?? o.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <div className="reader-end">
           <p className="reader-credit">সূত্র: {item.sourceName}। পুরো খবরের স্বত্ব সংশ্লিষ্ট সোর্সের।</p>
