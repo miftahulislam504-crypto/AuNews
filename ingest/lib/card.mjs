@@ -52,16 +52,19 @@ export async function fetchImageBuffer(url, { fetchImpl = fetch, timeoutMs = 150
   }
 }
 
-// একটি টেক্সট-লেয়ার (স্বচ্ছ PNG)। width>0 হলে সেই প্রস্থে শব্দ ধরে লাইন ভাঙে।
-async function textLayer(sharp, text, { size, color = "#ffffff", bold = true, width = 0, align = "left" }) {
+// sharp এর text ইনপুট। sharp এ width অবশ্যই ধনাত্মক পূর্ণসংখ্যা; লাইন না ভাঙতে চাইলে width বাদ দিতে হয় (০ দিলে ত্রুটি)
+export function textInput(text, { size, color = "#ffffff", bold = true, width = 0, align = "left" }) {
   const markup =
     `<span font_family="${escMarkup(CARD.FONT)}" weight="${bold ? "bold" : "normal"}" ` +
     `size="${Math.round(size * 1024)}" foreground="${color}">${escMarkup(text)}</span>`;
-  const { data, info } = await sharp({
-    text: { text: markup, font: CARD.FONT, width, align, rgba: true, dpi: 72, wrap: "word" },
-  })
-    .png()
-    .toBuffer({ resolveWithObject: true });
+  const t = { text: markup, font: CARD.FONT, align, rgba: true, dpi: 72, wrap: "word" };
+  if (Number.isInteger(width) && width > 0) t.width = width;
+  return { text: t };
+}
+
+// একটি টেক্সট-লেয়ার (স্বচ্ছ PNG)। width>0 হলে সেই প্রস্থে শব্দ ধরে লাইন ভাঙে।
+async function textLayer(sharp, text, opts) {
+  const { data, info } = await sharp(textInput(text, opts)).png().toBuffer({ resolveWithObject: true });
   return { input: data, width: info.width, height: info.height };
 }
 
@@ -145,7 +148,10 @@ export function createCardRenderer({ brand = "AuNews", host = "", fetchImpl = fe
 
       // ---- শিরোনাম (সাদা ডাঁটাসহ) ----
       const hl = await fitHeadline(sharp, String(headline ?? "").replace(/\s+/g, " ").trim(), W - 160);
-      const hlTop = PHOTO_H + 92;
+      // তারিখের সারি ও ফুটারের মাঝের জায়গায় শিরোনাম মাঝামাঝি বসে (ছোট শিরোনামে নিচে ফাঁকা পড়ে না)
+      const areaTop = PHOTO_H + 80;
+      const areaBottom = H - 110;
+      const hlTop = areaTop + Math.max(0, Math.round((areaBottom - areaTop - hl.height) / 2));
       layers.push({ input: svg(8, hl.height, `<rect width="8" height="${hl.height}" fill="#ffffff"/>`), left: 60, top: hlTop });
       layers.push({ input: hl.input, left: 100, top: hlTop });
 
