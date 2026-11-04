@@ -13,7 +13,7 @@ export const DAILY_DEFAULTS = {
   minSources: 2,
   windowHours: 24,
   maxWorld: 4,
-  keep: 7,
+  keep: 1,
 };
 
 export const toBn = (n) => String(n).replace(/\d/g, (d) => BN[Number(d)]);
@@ -51,9 +51,13 @@ export function buildEdition({ items, digests = [], cfg, now }) {
     if (sourceCount < cfg.minSources || members[0].publishedAt < since) continue;
     const digest = digestByCluster.get(clusterId) ?? members.map((m) => digestByMember.get(m.id)).find(Boolean) ?? null;
     let headline, lead = "", link = null, sourceName = "", rep = members[0];
+    let altLink = null, altSource = "";
     if (digest) {
       headline = digest.headline;
       lead = digest.lead;
+      // ব্রিফ ২৪ ঘণ্টা পরে মুছে গেলে তালিকার লিংক যেন ভাঙা না থাকে, তাই মূল সোর্সের লিংক জমা রাখি
+      altLink = members[0].link;
+      altSource = members[0].sourceName;
     } else {
       rep = members.find((m) => HAS_BN.test(m.titleBn ?? m.title)) ?? null;
       if (!rep) continue; // বাংলা শিরোনাম নেই; বাংলা চ্যানেল/পেজে ইংরেজি ঢোকাই না
@@ -63,7 +67,7 @@ export function buildEdition({ items, digests = [], cfg, now }) {
     }
     ranked.push({
       clusterId, headline, lead, sourceCount,
-      digestId: digest?.id ?? null, link, sourceName,
+      digestId: digest?.id ?? null, link, sourceName, ...(digest ? { altLink, altSource } : {}),
       scope: rep.scope, category: rep.category, latest: members[0].publishedAt,
     });
   }

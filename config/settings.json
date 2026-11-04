@@ -11,7 +11,7 @@
     }
   },
   "retention": {
-    "days": 7,
+    "days": 1,
     "mode": "rolling"
   },
   "ingest": {
@@ -34,7 +34,7 @@
     "minShared": 2,
     "maxHoursApart": 48,
     "trendingMinSources": 2,
-    "trendingWindowHours": 48,
+    "trendingWindowHours": 24,
     "trendingLimit": 30
   },
   "ai": {
@@ -92,7 +92,7 @@
     "minSources": 2,
     "windowHours": 24,
     "maxWorld": 4,
-    "keep": 7
+    "keep": 1
   },
   "telegram": {
     "enabled": true,
@@ -101,5 +101,36 @@
     "dailyMax": 25,
     "delayMs": 1500,
     "maxTries": 3
+  },
+  "matches": {
+    "enabled": true,
+    "football": {
+      "competitions": [
+        "WC",
+        "CL",
+        "PL",
+        "PD",
+        "SA",
+        "BL1"
+      ],
+      "maxResults": 8,
+      "maxUpcoming": 6
+    },
+    "cricket": {
+      "featuredTeams": [
+        "Bangladesh",
+        "India",
+        "Pakistan",
+        "Australia",
+        "England",
+        "South Africa",
+        "New Zealand",
+        "Sri Lanka",
+        "Afghanistan",
+        "West Indies"
+      ],
+      "maxResults": 8,
+      "maxUpcoming": 6
+    }
   }
 }

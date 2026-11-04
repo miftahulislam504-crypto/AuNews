@@ -1,5 +1,5 @@
 /* AuNews সার্ভিস ওয়ার্কার: পেজ নেটওয়ার্ক-ফার্স্ট (অফলাইনে আগে দেখা পেজ), স্ট্যাটিক ফাইল ক্যাশ-ফার্স্ট। */
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `aunews-pages-${VERSION}`;
 const STATIC = `aunews-static-${VERSION}`;
 const MAX_PAGES = 30;

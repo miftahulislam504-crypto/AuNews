@@ -1,9 +1,17 @@
 import settings from "@/config/settings.json";
 
-// হোমের "আজকের তথ্য" স্ট্রিপ। দুটোই বাইরের ফ্রি API; ব্যর্থ হলে null (স্ট্রিপে ওই অংশ দেখায় না)।
+// "দ্রুত" পেজের আবহাওয়া ও ডলারের দাম। দুটোই বাইরের ফ্রি API; ব্যর্থ হলে null (ওই কার্ডে "এখন পাওয়া যাচ্ছে না" দেখায়)।
 // Open-Meteo শুধু অবাণিজ্যিক ব্যবহারে ফ্রি; ExchangeRate-API এর ফ্রি এন্ডপয়েন্টে আয়-সূত্র লিংক দেখানো বাধ্যতামূলক।
 
-export type Weather = { name: string; temp: number; humidity: number | null; wind: number | null; label: string };
+export type Weather = {
+  temp: number;
+  humidity: number | null;
+  wind: number | null;
+  label: string;
+  max: number | null;
+  min: number | null;
+  rain: number | null; // আজ বৃষ্টির সম্ভাবনা %
+};
 export type Fx = { base: string; quote: string; rate: number; updated: string | null };
 
 // WMO ওয়েদার কোড → বাংলা
@@ -34,21 +42,30 @@ async function getJson(url: string, revalidate: number): Promise<unknown> {
   }
 }
 
-export async function getWeather(): Promise<Weather | null> {
-  const w = settings.info?.weather;
-  if (!w?.enabled) return null;
+export function weatherEnabled(): boolean {
+  return Boolean(settings.info?.weather?.enabled);
+}
+
+const pick = (v: unknown): number | null => (Array.isArray(v) && typeof v[0] === "number" && Number.isFinite(v[0]) ? Math.round(v[0]) : null);
+
+// যেকোনো অবস্থানের আবহাওয়া (প্রতিটি ব্যবহারকারীর এলাকা অনুযায়ী); অবস্থান /api/weather এ ০.১° এ গোল হয়ে আসে
+export async function getWeather(lat: number, lon: number): Promise<Weather | null> {
+  if (!weatherEnabled()) return null;
   const url =
-    `https://api.open-meteo.com/v1/forecast?latitude=${w.lat}&longitude=${w.lon}` +
-    "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Asia%2FDhaka";
-  const d = (await getJson(url, 1800)) as { current?: Record<string, unknown> } | null;
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m" +
+    "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=1&timezone=auto";
+  const d = (await getJson(url, 1800)) as { current?: Record<string, unknown>; daily?: Record<string, unknown> } | null;
   const c = d?.current;
   if (!c || typeof c.temperature_2m !== "number") return null;
   return {
-    name: w.name,
     temp: Math.round(c.temperature_2m),
     humidity: typeof c.relative_humidity_2m === "number" ? Math.round(c.relative_humidity_2m) : null,
     wind: typeof c.wind_speed_10m === "number" ? Math.round(c.wind_speed_10m) : null,
     label: typeof c.weather_code === "number" ? weatherLabel(c.weather_code) : "",
+    max: pick(d?.daily?.temperature_2m_max),
+    min: pick(d?.daily?.temperature_2m_min),
+    rain: pick(d?.daily?.precipitation_probability_max),
   };
 }
 

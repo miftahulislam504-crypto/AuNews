@@ -78,7 +78,7 @@ const items3 = () => [...cluster("a", 4), ...cluster("b", 3), ...cluster("c", 2)
 
 test("runDaily: সকাল ৭টার পর একবার তৈরি; একই দিনে আবার নয়; পরদিন নতুন", async () => {
   const store = mkStore(items3());
-  const r1 = await runDaily({ store, settings: {}, now: NOW });
+  const r1 = await runDaily({ store, settings: { daily: { keep: 7 } }, now: NOW });
   assert.equal(r1.created, true);
   assert.equal(store.s.daily.items[0].date, "2026-11-03");
   assert.equal(store.s.daily.items[0].label, "৩ নভেম্বর ২০২৬");
@@ -87,7 +87,7 @@ test("runDaily: সকাল ৭টার পর একবার তৈরি; �
   assert.equal(r2.skipped, "done");
   // পরদিন: খবরও নতুন (২৪ ঘণ্টা পরের) ধরে নিই
   const next = mkStore(items3().map((m) => ({ ...m, publishedAt: m.publishedAt + 24 * H })), { daily: store.s.daily });
-  const r3 = await runDaily({ store: next, settings: {}, now: NOW + 24 * H });
+  const r3 = await runDaily({ store: next, settings: { daily: { keep: 7 } }, now: NOW + 24 * H });
   assert.equal(r3.created, true);
   assert.equal(next.s.daily.items.length, 2);
 });
@@ -99,7 +99,25 @@ test("runDaily: ৭টার আগে নয়; খবর কম হলে ন
   assert.equal((await runDaily({ store: mkStore(items3()), settings: { daily: { enabled: false } }, now: NOW })).skipped, "disabled");
   const old = Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${10 + i}`, stories: [] }));
   const store = mkStore(items3(), { daily: { items: old } });
-  await runDaily({ store, settings: {}, now: NOW });
+  await runDaily({ store, settings: { daily: { keep: 7 } }, now: NOW });
   assert.equal(store.s.daily.items.length, 7);
   assert.equal(store.s.daily.items[0].date, "2026-11-03");
+});
+
+test("runDaily: ডিফল্টে শুধু সর্বশেষ ১টি সংস্করণ থাকে (২৪ ঘণ্টা রিটেনশন)", async () => {
+  const old = [{ date: "2026-11-02", stories: [] }];
+  const store = mkStore(items3(), { daily: { items: old } });
+  await runDaily({ store, settings: {}, now: NOW });
+  assert.equal(store.s.daily.items.length, 1);
+  assert.equal(store.s.daily.items[0].date, "2026-11-03");
+});
+
+test("buildEdition: ব্রিফ-ভিত্তিক গল্পে মূল সোর্সের লিংক জমা থাকে (ব্রিফ মুছলে ফলব্যাক)", () => {
+  const items = cluster("a", 3);
+  const digests = [{ id: "d".repeat(20), clusterId: "a", headline: "ব্রিফ শিরোনাম", lead: "ভূমিকা", memberIds: [] }];
+  const st = buildEdition({ items, digests, cfg: { ...DAILY_DEFAULTS, minSources: 2 }, now: NOW });
+  assert.equal(st[0].digestId, "d".repeat(20));
+  assert.equal(st[0].link, null);
+  assert.ok(st[0].altLink.startsWith("https://"));
+  assert.ok(st[0].altSource);
 });

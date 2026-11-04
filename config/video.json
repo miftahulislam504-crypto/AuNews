@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "maxPerChannel": 6,
+  "maxItems": 120,
+  "skipShorts": true,
+  "channels": [
+    { "id": "jamuna", "name": "যমুনা টিভি", "handles": ["@JamunaTelevision", "@jamunatv", "@JamunaTVBD", "@JamunaTVbd"], "match": "jamuna|যমুনা" },
+    { "id": "somoy", "name": "সময় টিভি", "handles": ["@SomoyTV", "@somoytv", "@SomoyNews", "@SOMOYTVLIVE"], "match": "somoy|সময়" },
+    { "id": "channel24", "name": "চ্যানেল ২৪", "handles": ["@Channel24Television", "@channel24bd", "@Channel24", "@channel24tv"], "match": "channel\\s*24|চ্যানেল\\s*(২৪|24)" },
+    { "id": "ekattor", "name": "একাত্তর টিভি", "handles": ["@EkattorTV", "@ekattortv", "@Ekattor71", "@ekattor"], "match": "ekattor|একাত্তর" },
+    { "id": "independent", "name": "ইন্ডিপেন্ডেন্ট টিভি", "handles": ["@IndependentTelevision", "@independenttv", "@IndependentTVBD"], "match": "independent|ইন্ডিপেন্ডেন্ট" },
+    { "id": "dbc", "name": "ডিবিসি নিউজ", "handles": ["@DBCNews", "@dbcnewstv", "@DBCNewsBD"], "match": "dbc" },
+    { "id": "ntv", "name": "এনটিভি", "handles": ["@NTVBD", "@ntvbd", "@NTVNews", "@ntvbangladesh"], "match": "ntv\\s*(bangla|bd|bangladesh|news)|এনটিভি" },
+    { "id": "rtv", "name": "আরটিভি", "handles": ["@RTVOnline", "@rtvonline", "@RtvBd"], "match": "rtv|আরটিভি" },
+    { "id": "channeli", "name": "চ্যানেল আই", "handles": ["@ChannelIOnline", "@channelionline", "@channeli"], "match": "channel\\s*i\\b|চ্যানেল\\s*আই" },
+    { "id": "atn", "name": "এটিএন নিউজ", "handles": ["@ATNNewsTV", "@ATNNews", "@atnnewstv"], "match": "atn" },
+    { "id": "bbc", "name": "বিবিসি বাংলা", "handles": ["@bbcnewsbangla", "@BBCBangla", "@BBCNewsBengali"], "match": "bbc" },
+    { "id": "dw", "name": "ডিডব্লিউ বাংলা", "handles": ["@dwbangla", "@DWBangla"], "match": "dw|deutsche" },
+    { "id": "prothomalo", "name": "প্রথম আলো", "handles": ["@prothomalo", "@ProthomAlo", "@prothomalonews"], "match": "prothom\\s*alo|প্রথম\\s*আলো" },
+    { "id": "jagonews", "name": "জাগো নিউজ", "handles": ["@jagonews24", "@JagoNews24", "@Jagonews24com"], "match": "jago|জাগো" }
+  ]
+}

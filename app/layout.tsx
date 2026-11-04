@@ -3,6 +3,7 @@ import { Hind_Siliguri, Noto_Serif_Bengali } from "next/font/google";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import settings from "@/config/settings.json";
+import BottomNav from "@/components/BottomNav";
 import CategoryTabs from "@/components/CategoryTabs";
 import DateLine from "@/components/DateLine";
 import HeaderActions from "@/components/HeaderActions";
@@ -42,6 +43,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover", // PWA তে নিচের মেনু যেন ফোনের নিচের বারের নিচে না ঢোকে (safe-area)
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#0b4f3c" },
     { media: "(prefers-color-scheme: dark)", color: "#0a2f25" },
@@ -74,6 +76,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Link href="/about">আমাদের সম্পর্কে</Link> · <Link href="/ai">এআই ব্রিফ</Link> · <a href="/feed.xml">RSS</a>
           </p>
         </footer>
+        <BottomNav />
         <ServiceWorkerRegister />
       </body>
     </html>

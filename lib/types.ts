@@ -84,6 +84,8 @@ export interface DailyStory {
   digestId: string | null; // এআই ব্রিফ থাকলে তার id
   link: string | null; // ব্রিফ না থাকলে মূল সোর্সের লিংক
   sourceName: string;
+  altLink?: string | null; // ব্রিফ মুছে গেলে এই মূল সোর্স-লিংকে নেওয়া হয়
+  altSource?: string;
   scope: Scope;
   category: string;
 }
@@ -93,4 +95,18 @@ export interface DailyEdition {
   label: string; // "৩ নভেম্বর ২০২৬"
   generatedAt: number;
   stories: DailyStory[];
+}
+
+// ভিডিও (data ব্রাঞ্চের feeds/videos.json) — YouTube চ্যানেলের RSS থেকে
+export interface VideoItem {
+  id: string; // YouTube video id
+  title: string;
+  channelId: string;
+  channelKey: string;
+  channelName: string;
+  publishedAt: number; // ms
+}
+
+export interface VideoView extends VideoItem {
+  timeLabel: string;
 }

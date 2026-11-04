@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DailyView from "@/components/DailyView";
 import { getEdition, getEditions } from "@/lib/daily";
+import { getDigests } from "@/lib/digest";
 
 export const revalidate = 600;
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function DailyDatePage({ params }: Props) {
   const { date } = await params;
-  const [edition, all] = await Promise.all([getEdition(date), getEditions()]);
+  const [edition, all, digests] = await Promise.all([getEdition(date), getEditions(), getDigests()]);
   if (!edition) notFound();
-  return <DailyView edition={edition} others={all.filter((e) => e.date !== edition.date)} />;
+  return <DailyView edition={edition} others={all.filter((e) => e.date !== edition.date)} liveDigestIds={digests.map((d) => d.id)} />;
 }

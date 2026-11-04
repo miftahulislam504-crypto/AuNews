@@ -19,6 +19,8 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     shortcuts: [
+      { name: "দ্রুত", url: "/quick" },
+      { name: "ভিডিও", url: "/video" },
       { name: "খুঁজুন", url: "/search" },
       { name: "সংরক্ষিত", url: "/saved" },
     ],
