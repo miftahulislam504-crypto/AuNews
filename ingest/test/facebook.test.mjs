@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { formatDigestCaption, formatNewsCaption, createFacebookClient, runFacebook, FbError } from "../lib/facebook.mjs";
-import { escMarkup } from "../lib/card.mjs";
+import { escMarkup, textInput } from "../lib/card.mjs";
 
 const H = 3600000;
 const NOW = Date.parse("2026-11-04T06:10:00Z"); // স্লট: ০৬:০০ UTC
@@ -221,4 +221,14 @@ test("createFacebookClient: ত্রুটির শ্রেণিবিন্
 
 test("card: escMarkup pango মার্কআপের বিশেষ ক্যারেক্টার escape করে", () => {
   assert.equal(escMarkup(`A & B <i> "q" 'w'`), "A &amp; B &lt;i&gt; &quot;q&quot; &#39;w&#39;");
+});
+
+test("card: sharp এর text.width কখনো ০ যায় না (০ দিলে sharp ত্রুটি দেয়); ধনাত্মক হলে যায়", () => {
+  const free = textInput("AuNews", { size: 40, width: 0 }).text;
+  assert.equal("width" in free, false);
+  assert.equal("height" in free, false); // height ও dpi একসাথে দিলে sharp ত্রুটি দেয়
+  assert.equal(textInput("ক", { size: 40 }).text.width, undefined);
+  assert.equal(textInput("ক", { size: 40, width: 920 }).text.width, 920);
+  const t = textInput("A & <B>", { size: 50, width: 900 }).text;
+  assert.ok(t.text.includes("A &amp; &lt;B&gt;") && t.text.includes('size="51200"') && t.rgba === true && t.dpi === 72);
 });
