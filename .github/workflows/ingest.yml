@@ -2,6 +2,7 @@ name: Ingest news
 
 on:
   schedule:
+    # প্রতি ৩০ মিনিটে চলে; ফেসবুকে প্রতি ঘণ্টার স্লটে একটিই পোস্ট যায় (settings.json → facebook.intervalMinutes)
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
@@ -36,6 +37,13 @@ jobs:
         working-directory: ingest
         run: npm install --no-audit --no-fund
 
+      # ফেসবুকের নিউজ-কার্ডে বাংলা লেখা আঁকতে সিস্টেম ফন্ট লাগে (Noto Sans Bengali)
+      - name: Install Bengali fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-core fontconfig
+          fc-list :lang=bn family | sort -u | head -5
+
       - name: Ingest
         working-directory: ingest
         run: node run.mjs
@@ -48,6 +56,19 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
           TELEGRAM_DRY_RUN: ${{ vars.TELEGRAM_DRY_RUN }}
           SITE_URL: ${{ vars.SITE_URL }}
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ vars.FACEBOOK_PAGE_ID || secrets.FACEBOOK_PAGE_ID }}
+          FACEBOOK_DRY_RUN: ${{ vars.FACEBOOK_DRY_RUN }}
+          FACEBOOK_API_VERSION: ${{ vars.FACEBOOK_API_VERSION }}
+
+      # ড্রাই-রানে (FACEBOOK_DRY_RUN=1) বানানো কার্ড ও ক্যাপশন ডাউনলোড করে দেখার জন্য
+      - name: Upload Facebook preview
+        if: ${{ always() && vars.FACEBOOK_DRY_RUN == '1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: facebook-preview
+          path: ingest/out/
+          if-no-files-found: ignore
 
       # ইতিহাস জমে রিপো ভারী না হতে প্রতিবার একটিমাত্র কমিট দিয়ে data ব্রাঞ্চ বদলানো হয়
       - name: Publish data branch
