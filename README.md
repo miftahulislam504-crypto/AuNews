@@ -132,7 +132,7 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 - `matches.*`: ম্যাচ কার্ড (কোন ফুটবল লিগ, কোন ক্রিকেট দল, সর্বোচ্চ কয়টি)। `config/video.json`: ভিডিও চ্যানেল।
 - `daily.*`: আজকের বড় খবর (`hourDhaka`, `maxStories`, `minSources`, `maxWorld`, `keep: 1`)।
 - `telegram.*`: টেলিগ্রাম পোস্টের সীমা (`maxAgeHours`, `maxPerRun`, `dailyMax`)।
-- `facebook.*`: ফেসবুক পোস্ট (`intervalMinutes: 60`, `maxAgeHours`, `dailyMax`, `fallbackToNews`, `newsMinSources`, `hashtags`, `apiVersion`)।
+- `facebook.*`: ফেসবুক পোস্ট (`intervalMinutes: 60`, `maxAgeHours`, `dailyMax`, `fallbackToNews`, `newsMinSources`, `requirePhoto` (খবরের আসল ছবি না মিললে পোস্ট হয় না; ছবি প্রথমে RSS থেকে, না পেলে সোর্স-পেজের og:image থেকে), `hashtags`, `apiVersion`)।
 
 ## ফোল্ডার
 ```

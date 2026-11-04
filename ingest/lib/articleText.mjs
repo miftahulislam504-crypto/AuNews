@@ -67,7 +67,7 @@ export function extractText(html) {
   return pick.length >= 300 ? pick : "";
 }
 
-function isPrivateHost(host) {
+export function isPrivateHost(host) {
   const h = host.toLowerCase();
   return (
     h === "localhost" || h.endsWith(".local") || h.endsWith(".internal") ||

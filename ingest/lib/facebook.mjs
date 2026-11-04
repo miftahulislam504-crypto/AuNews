@@ -18,6 +18,7 @@ export const FB_DEFAULTS = {
   maxAttempts: 2, // এক রানে সর্বোচ্চ কয়টি খবর চেষ্টা
   fallbackToNews: true, // নতুন এআই ব্রিফ না থাকলে একাধিক সোর্সে আসা সাধারণ খবর থেকে
   newsMinSources: 2,
+  requirePhoto: true, // খবরের আসল ছবি না মিললে পোস্ট নয় (ব্র্যান্ড-ব্যাকগ্রাউন্ডের কার্ড নয়); false দিলে আগের মতো ফলব্যাক কার্ড যায়
   hashtags: ["#AuNews"],
   apiVersion: "v25.0",
 };
@@ -122,6 +123,7 @@ function digestCandidates({ digests, posted, tries, cfg, now }) {
       marks: [`d:${d.id}`, ...(d.clusterId ? [`c:${d.clusterId}`] : [])],
       headline: d.headline,
       imageUrl: d.image || null,
+      pageUrls: (d.sources ?? []).map((x) => x.link).filter(Boolean), // RSS এ ছবি না থাকলে এসব পেজের og:image
       caption: (siteUrl, tags) => formatDigestCaption(d, siteUrl, tags),
     }));
 }
@@ -141,9 +143,9 @@ function newsCandidates({ items, posted, tries, cfg, now }) {
     if (sourceCount < cfg.newsMinSources) continue;
     const key = `c:${clusterId}`;
     if (posted[key] || (tries[key] || 0) >= cfg.maxTries) continue;
-    const rep = [...members]
-      .sort((a, b) => b.publishedAt - a.publishedAt)
-      .find((m) => m.image && HAS_BN.test(bnTitle(m)));
+    const sorted = [...members].sort((a, b) => b.publishedAt - a.publishedAt);
+    // বাংলা শিরোনাম লাগবে; ছবিসহ আইটেম আগে (ছবি না থাকলে সোর্স-পেজের og:image খোঁজা হবে)
+    const rep = sorted.find((m) => m.image && HAS_BN.test(bnTitle(m))) ?? sorted.find((m) => HAS_BN.test(bnTitle(m)));
     if (!rep) continue;
     out.push({
       sourceCount,
@@ -153,7 +155,9 @@ function newsCandidates({ items, posted, tries, cfg, now }) {
         key,
         marks: [key],
         headline: bnTitle(rep),
-        imageUrl: rep.image,
+        imageUrl: rep.image || null,
+        imageUrls: sorted.map((m) => m.image).filter(Boolean),
+        pageUrls: [rep.link, ...sorted.map((m) => m.link)].filter(Boolean),
         caption: (siteUrl, tags) => formatNewsCaption({ summary: bnSummary(rep), sourceName: rep.sourceName, link: rep.link }, siteUrl, tags),
       },
     });
@@ -209,7 +213,14 @@ export async function runFacebook({ store, client, render, settings, siteUrl, no
     try {
       let image;
       try {
-        image = await render({ headline: job.headline, imageUrl: job.imageUrl, dateLabel });
+        image = await render({
+          headline: job.headline,
+          imageUrl: job.imageUrl,
+          imageUrls: job.imageUrls ?? [],
+          pageUrls: job.pageUrls ?? [],
+          dateLabel,
+          requirePhoto: cfg.requirePhoto,
+        });
       } catch (e) {
         throw new FbError("render", `কার্ড তৈরি ব্যর্থ: ${String(e?.message ?? e).slice(0, 200)}`);
       }

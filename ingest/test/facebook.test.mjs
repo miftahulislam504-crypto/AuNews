@@ -89,7 +89,7 @@ test("runFacebook: নতুন ব্রিফ না থাকলে বহু
     news("n1", "k1", "s1"), news("n2", "k1", "s2"), news("n3", "k1", "s3"),
     news("m1", "k2", "s1"), news("m2", "k2", "s2"),
     news("solo", "k3", "s1"), // একটি সোর্স: বাদ
-    news("noimg", "k4", "s1", { image: null }), news("noimg2", "k4", "s2", { image: null }), // ছবি নেই: বাদ
+    news("noimg", "k4", "s1", { image: null }), news("noimg2", "k4", "s2", { image: null }), // RSS এ ছবি নেই: তবু প্রার্থী (পেজ থেকে og:image খোঁজা হবে)
     news("covered1", "c-d1", "s1"), news("covered2", "c-d1", "s2"),
   ];
   const store = mkStore({ digests: [digest("d1", 2)], items });
@@ -102,8 +102,9 @@ test("runFacebook: নতুন ব্রিফ না থাকলে বহু
   await run({ store, client: c, now: NOW + 2 * H });
   await run({ store, client: c, now: NOW + 3 * H });
   const heads = c.posts.map((p) => p.image.toString());
-  assert.equal(heads.length, 3); // d1, k1, k2 — covered/solo/noimg নয়
-  assert.ok(!heads.some((h) => /covered|solo|noimg/.test(h)));
+  assert.equal(heads.length, 4); // d1, k1, k2, ছবিহীন k4 — covered/solo নয়
+  assert.ok(!heads.some((h) => /covered|solo/.test(h)));
+  assert.ok(heads.some((h) => /noimg/.test(h))); // ছবিহীন আইটেম সবার শেষে
 });
 
 test("runFacebook: ইংরেজি খবরে বাংলা অনুবাদ না থাকলে বাদ, থাকলে অনুবাদ ব্যবহার", async () => {
@@ -231,4 +232,29 @@ test("card: sharp এর text.width কখনো ০ যায় না (০ �
   assert.equal(textInput("ক", { size: 40, width: 920 }).text.width, 920);
   const t = textInput("A & <B>", { size: 50, width: 900 }).text;
   assert.ok(t.text.includes("A &amp; &lt;B&gt;") && t.text.includes('size="51200"') && t.rgba === true && t.dpi === 72);
+});
+
+test("runFacebook: রেন্ডারারকে ছবির ঠিকানা, সোর্স-পেজ ও requirePhoto দেওয়া হয় (ডিফল্ট true)", async () => {
+  const calls = [];
+  const spy = async (o) => { calls.push(o); return Buffer.from("x"); };
+  const d = digest("p1", 1, { image: null, sources: [{ n: 1, link: "https://a.test/1" }, { n: 2, link: "https://b.test/2" }] });
+  await run({ store: mkStore({ digests: [d] }), client: fakeClient(), render: spy });
+  assert.equal(calls[0].imageUrl, null);
+  assert.deepEqual(calls[0].pageUrls, ["https://a.test/1", "https://b.test/2"]);
+  assert.equal(calls[0].requirePhoto, true);
+  const items = [news("a", "k9", "s1", { image: null }), news("b", "k9", "s2", { image: "https://img.test/b.jpg" })];
+  await run({ store: mkStore({ items }), client: fakeClient(), render: spy, settings: { facebook: { requirePhoto: false } } });
+  assert.equal(calls[1].requirePhoto, false);
+  assert.deepEqual(calls[1].imageUrls, ["https://img.test/b.jpg"]);
+  assert.ok(calls[1].pageUrls.includes("https://n.test/a") && calls[1].pageUrls.includes("https://n.test/b"));
+});
+
+test("runFacebook: ছবি না মিললে (render ব্যর্থ) ওই খবর বাদ, পরের খবর যায়", async () => {
+  const digests = [digest("nophoto", 1), digest("ok", 2)];
+  const picky = async ({ headline }) => { if (/nophoto/.test(headline)) throw new Error("খবরের ছবি পাওয়া যায়নি"); return Buffer.from(`img:${headline}`); };
+  const c = fakeClient();
+  const s = await run({ store: mkStore({ digests }), client: c, render: picky });
+  assert.equal(s.sent, 1);
+  assert.equal(c.posts[0].image.toString(), "img:শিরোনাম ok");
+  assert.match(s.errors[0], /render: কার্ড তৈরি ব্যর্থ: খবরের ছবি পাওয়া যায়নি/);
 });

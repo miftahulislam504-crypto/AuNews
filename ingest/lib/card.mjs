@@ -3,6 +3,8 @@
 // সিস্টেমে বাংলা ফন্ট লাগে: GitHub Actions এ `fonts-noto-core` (Noto Sans Bengali) ইনস্টল হয় (ingest.yml দেখুন)।
 // sharp আলসেভাবে (lazy) লোড হয়, তাই ফেসবুক বন্ধ থাকলে বা sharp না থাকলে বাকি ইনজেস্ট প্রভাবিত হয় না।
 
+import { fetchOgImages } from "./ogImage.mjs";
+
 export const CARD = {
   W: 1080,
   H: 1350,
@@ -12,6 +14,10 @@ export const CARD = {
   RED_BOTTOM: "#7a0b10",
   HEADLINE_SIZES: [68, 62, 56, 50, 46, 42, 38],
   HEADLINE_MAX_H: 330,
+  PHOTO_MIN_W: 320, // এর চেয়ে ছোট ছবি নেওয়া হয় না
+  PHOTO_MIN_H: 180,
+  PHOTO_GOOD_W: 720, // এর বেশি চওড়া হলে আর খুঁজি না
+  PHOTO_MAX_PAGES: 3, // ছবি না পেলে সর্বোচ্চ এতটি সোর্স-পেজ থেকে og:image খুঁজি
 };
 
 // pango মার্কআপে এই ক্যারেক্টারগুলো escape করতে হয়
@@ -38,7 +44,11 @@ export async function fetchImageBuffer(url, { fetchImpl = fetch, timeoutMs = 150
     const res = await fetchImpl(url, {
       redirect: "follow",
       signal: ctrl.signal,
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; AuNewsBot/1.0)", Accept: "image/avif,image/webp,image/*,*/*;q=0.8" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; AuNewsBot/1.0)",
+        Accept: "image/avif,image/webp,image/*,*/*;q=0.8",
+        Referer: new URL(url).origin + "/", // হটলিংক-ব্লক করা সিডিএন এর জন্য
+      },
     });
     if (!res.ok) return null;
     const len = Number(res.headers.get("content-length"));
@@ -81,10 +91,46 @@ async function fitHeadline(sharp, headline, width) {
 
 const svg = (w, h, body) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`);
 
-// ফেরত: { render({ headline, imageUrl, dateLabel }) → Buffer(JPEG) }
+// একটি ছবির ঠিকানা নামিয়ে মাপ যাচাই; লোগো-স্ট্রিপের মতো অতি লম্বা/চওড়া ছবি বাদ
+async function loadPhoto(sharp, url, fetchImpl) {
+  const raw = await fetchImageBuffer(url, { fetchImpl });
+  if (!raw) return null;
+  try {
+    const meta = await sharp(raw, { failOn: "none" }).metadata();
+    const w = meta.width ?? 0;
+    const h = meta.height ?? 0;
+    if (w < CARD.PHOTO_MIN_W || h < CARD.PHOTO_MIN_H) return null;
+    const ratio = w / h;
+    if (ratio > 3 || ratio < 0.5) return null;
+    return { raw, w };
+  } catch {
+    return null;
+  }
+}
+
+// সেরা ছবি বাছে: ১) RSS এর ছবি(গুলো)  ২) না মিললে/ছোট হলে সোর্স-পেজের og:image। না পেলে null
+export async function pickPhoto(sharp, { imageUrls = [], pageUrls = [], fetchImpl = fetch } = {}) {
+  let best = null;
+  const tried = new Set();
+  const consider = async (u) => {
+    if (!u || tried.has(u)) return false;
+    tried.add(u);
+    const p = await loadPhoto(sharp, u, fetchImpl);
+    if (p && (!best || p.w > best.w)) best = p;
+    return !!best && best.w >= CARD.PHOTO_GOOD_W;
+  };
+  for (const u of imageUrls) if (await consider(u)) return best.raw;
+  for (const page of pageUrls.slice(0, CARD.PHOTO_MAX_PAGES)) {
+    for (const u of (await fetchOgImages(page, { fetchImpl })).slice(0, 2)) if (await consider(u)) return best.raw;
+  }
+  return best ? best.raw : null;
+}
+
+// ফেরত: { render({ headline, imageUrl, imageUrls, pageUrls, dateLabel, requirePhoto }) → Buffer(JPEG) }
+// requirePhoto=true হলে কোনো ছবি না মিললে exception (ব্র্যান্ড-ব্যাকগ্রাউন্ডের কার্ড যায় না)
 export function createCardRenderer({ brand = "AuNews", host = "", fetchImpl = fetch } = {}) {
   return {
-    async render({ headline, imageUrl, dateLabel }) {
+    async render({ headline, imageUrl, imageUrls = [], pageUrls = [], dateLabel, requirePhoto = false }) {
       const sharp = await loadSharp();
       const { W, H, PHOTO_H } = CARD;
       const bandH = H - PHOTO_H;
@@ -92,21 +138,19 @@ export function createCardRenderer({ brand = "AuNews", host = "", fetchImpl = fe
 
       // ---- ওপরের অংশ: খবরের ছবি, না পেলে ব্র্যান্ডেড ব্যাকগ্রাউন্ড ----
       let photo = null;
-      const raw = await fetchImageBuffer(imageUrl, { fetchImpl });
+      const raw = await pickPhoto(sharp, { imageUrls: [imageUrl, ...imageUrls], pageUrls, fetchImpl });
       if (raw) {
         try {
-          const meta = await sharp(raw, { failOn: "none" }).metadata();
-          if ((meta.width ?? 0) >= 320 && (meta.height ?? 0) >= 180) {
-            photo = await sharp(raw, { failOn: "none" })
-              .rotate()
-              .resize(W, PHOTO_H, { fit: "cover", position: sharp.strategy.attention })
-              .jpeg({ quality: 92 })
-              .toBuffer();
-          }
+          photo = await sharp(raw, { failOn: "none" })
+            .rotate()
+            .resize(W, PHOTO_H, { fit: "cover", position: sharp.strategy.attention })
+            .jpeg({ quality: 92 })
+            .toBuffer();
         } catch {
           photo = null;
         }
       }
+      if (!photo && requirePhoto) throw new Error("খবরের ছবি পাওয়া যায়নি");
       if (photo) {
         layers.push({ input: photo, left: 0, top: 0 });
         // ছবির নিচের দিক একটু গাঢ় করে ব্যান্ডের সঙ্গে মেশানো

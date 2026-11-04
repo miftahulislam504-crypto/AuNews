@@ -111,6 +111,7 @@
     "maxAttempts": 2,
     "fallbackToNews": true,
     "newsMinSources": 2,
+    "requirePhoto": true,
     "hashtags": [
       "#AuNews"
     ],
