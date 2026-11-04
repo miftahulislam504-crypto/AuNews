@@ -77,6 +77,24 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 - বন্ধ করতে: `telegram.enabled` = `false` বা Secret মুছুন। সেটিং: `config/settings.json` → `telegram`।
 - সাইটের ঠিকানা বদলালে Variables এ `SITE_URL` দিন (না দিলে `settings.json` এর `site.url`)।
 
+## ফেসবুক পেজে অটো-পোস্ট (নতুন)
+প্রতি **৬০ মিনিটে একটি** ছবি-পোস্ট যায়। ছবিটি নিউজ-কার্ডের মতো: ওপরে খবরের ছবি, নিচে লাল ব্যান্ডে **শিরোনাম** (সঙ্গে তারিখ ও ব্র্যান্ড); **মূল লেখা** (ভূমিকা, ৩টি তথ্য, সোর্স সংখ্যা, লিংক) ক্যাপশনে।
+- কোন খবর যায়: সবচেয়ে নতুন **এআই ব্রিফ** (১২ ঘণ্টার মধ্যে)। নতুন ব্রিফ না থাকলে একাধিক সোর্সে আসা, ছবি ও বাংলা শিরোনামসহ সাধারণ খবর (ক্যাপশনে সোর্সের নাম ও মূল লিংক)। এটি বন্ধ করতে `facebook.fallbackToNews` = `false`।
+- সময়: ওয়ার্কফ্লো প্রতি ৩০ মিনিটে চলে; প্রতি ঘণ্টার স্লটে একটিই পোস্ট যায়। কোনো রান ব্যর্থ হলে একই ঘণ্টার পরের রানে আবার চেষ্টা হয়, তাই সময় সরে সরে যায় না।
+- একই ঘটনা দুবার যায় না (ব্রিফ হয়ে গেলে ওই ঘটনার সাধারণ খবর আর যায় না)। দিনে সর্বোচ্চ ৩০টি।
+- ছবি না পেলে বা ছোট হলে ব্র্যান্ডেড ব্যাকগ্রাউন্ডে কার্ড হয়।
+সেটআপ:
+1. GitHub রিপো → Settings → Secrets and variables → Actions:
+   - **Secrets** এ `FACEBOOK_PAGE_TOKEN` = **Page Access Token** (ইউজার টোকেন নয়; অনুমতি: `pages_manage_posts`, `pages_read_engagement`)
+   - **Variables** এ `FACEBOOK_PAGE_ID` = পেজের আইডি (সংখ্যা)
+2. **আগে ড্রাই-রান**: Variables এ `FACEBOOK_DRY_RUN` = `1` দিয়ে Actions → Ingest news → Run workflow। কিছু পোস্ট হয় না; রানের শেষে **Artifacts → facebook-preview** এ কার্ডের ছবি (`facebook-card-1.jpg`) ও ক্যাপশন (`facebook-caption-1.txt`) নামিয়ে দেখুন। ঠিক লাগলে `FACEBOOK_DRY_RUN` মুছে দিন; তখন থেকে সত্যিকারের পোস্ট।
+3. রান Summary তে "ফেসবুক" লাইনে ফল ও ত্রুটি দেখাবে। টোকেন/অনুমতির ত্রুটিতে ৬ ঘণ্টা, রেট-লিমিটে ৩০ মিনিট বিরতি দিয়ে আবার চেষ্টা করে।
+- টোকেন: **long-lived Page token** নিন (User token → long-lived → `me/accounts` থেকে Page token; এটি সাধারণত মেয়াদ-হীন)। কার্ড ঠিক না লাগলে বা পোস্ট না গেলে Summary র ত্রুটিটি দেখুন (যেমন `#190` = টোকেন অচল, `#200` = অনুমতি নেই)।
+- বাংলা ফন্ট: ওয়ার্কফ্লো নিজে `fonts-noto-core` (Noto Sans Bengali) ইনস্টল করে; কার্ডের ছবি আঁকে `sharp` দিয়ে।
+- Graph API ভার্সন: ডিফল্ট `v25.0`; বদলাতে Variables এ `FACEBOOK_API_VERSION` (যেমন `v26.0`)।
+- বন্ধ করতে: `facebook.enabled` = `false` বা Secret মুছুন। সেটিং: `config/settings.json` → `facebook`।
+- সতর্কতা: খবরের ছবি ও শিরোনাম অন্য সংবাদমাধ্যমের হতে পারে; পেজে সেগুলো দিলে কপিরাইট অভিযোগ আসতে পারে। ক্যাপশনে সোর্সের লিংক থাকে।
+
 ## গুগলে আনা (Search Console)
 কোড দিকটা তৈরি: `sitemap.xml`, `robots.txt`, শেয়ার-প্রিভিউ ট্যাগ, `canonical`, ব্রিফে NewsArticle ডেটা, `/about`, `/feed.xml`। আপনাকে শুধু যাচাই করাতে হবে:
 1. search.google.com/search-console → **Add property** → **URL prefix** → `https://aunews.vercel.app`
@@ -114,6 +132,7 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 - `matches.*`: ম্যাচ কার্ড (কোন ফুটবল লিগ, কোন ক্রিকেট দল, সর্বোচ্চ কয়টি)। `config/video.json`: ভিডিও চ্যানেল।
 - `daily.*`: আজকের বড় খবর (`hourDhaka`, `maxStories`, `minSources`, `maxWorld`, `keep: 1`)।
 - `telegram.*`: টেলিগ্রাম পোস্টের সীমা (`maxAgeHours`, `maxPerRun`, `dailyMax`)।
+- `facebook.*`: ফেসবুক পোস্ট (`intervalMinutes: 60`, `maxAgeHours`, `dailyMax`, `fallbackToNews`, `newsMinSources`, `hashtags`, `apiVersion`)।
 
 ## ফোল্ডার
 ```

@@ -1,4 +1,4 @@
-import { appendFile, readFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchFeed } from "./lib/feeds.mjs";
@@ -9,6 +9,8 @@ import { createGroqDigester, runDigest } from "./lib/digest.mjs";
 import { runDaily, toBn } from "./lib/daily.mjs";
 import { runVideos } from "./lib/youtube.mjs";
 import { createTelegramClient, runTelegram } from "./lib/telegram.mjs";
+import { createFacebookClient, runFacebook, FB_DEFAULTS } from "./lib/facebook.mjs";
+import { createCardRenderer } from "./lib/card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const readJson = async (rel) => JSON.parse(await readFile(path.join(here, rel), "utf8"));
@@ -97,6 +99,41 @@ if (tgToken && tgChat) {
   }
 }
 
+// ফেসবুক পেজে ছবি-পোস্ট (প্রতি ৬০ মিনিটে একটি); ব্যর্থ হলেও মূল ইনজেস্ট অক্ষত
+let fbStats = null;
+let fbError = null;
+const fbToken = process.env.FACEBOOK_PAGE_TOKEN;
+const fbPage = process.env.FACEBOOK_PAGE_ID;
+const fbDry = process.env.FACEBOOK_DRY_RUN === "1";
+const fbOutDir = path.join(here, "out"); // ড্রাই-রানের কার্ড এখানে সেভ হয়; ওয়ার্কফ্লো Artifact হিসেবে দেয়
+if ((fbToken && fbPage) || fbDry) {
+  try {
+    const siteUrl = (process.env.SITE_URL || settings.site.url).replace(/\/+$/, "");
+    const host = siteUrl.replace(/^https?:\/\//, "");
+    fbStats = await runFacebook({
+      store,
+      client: createFacebookClient({
+        pageId: fbPage || "dry-run",
+        token: fbToken || "dry-run",
+        apiVersion: process.env.FACEBOOK_API_VERSION || settings.facebook?.apiVersion || FB_DEFAULTS.apiVersion,
+      }),
+      render: (job) => createCardRenderer({ brand: settings.site.name || "AuNews", host }).render(job),
+      settings,
+      siteUrl,
+      dryRun: fbDry,
+    });
+    if (fbDry && fbStats.preview.length) {
+      await mkdir(fbOutDir, { recursive: true });
+      for (const [i, p] of fbStats.preview.entries()) {
+        await writeFile(path.join(fbOutDir, `facebook-card-${i + 1}.jpg`), p.image);
+        await writeFile(path.join(fbOutDir, `facebook-caption-${i + 1}.txt`), p.caption);
+      }
+    }
+  } catch (e) {
+    fbError = String(e?.message || e);
+  }
+}
+
 const retDays = settings.retention?.days ?? 1;
 const retLabel = retDays === 1 ? "২৪ ঘণ্টার" : `${toBn(retDays)} দিনের`;
 const lines = [
@@ -157,6 +194,19 @@ if (tgStats) {
   lines.push(`- টেলিগ্রাম: ⚠️ ${tgError}`);
 } else {
   lines.push("- টেলিগ্রাম: বন্ধ (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID নেই)");
+}
+if (fbStats) {
+  lines.push(
+    fbStats.skipped
+      ? `- ফেসবুক: বাদ (${{ not_due: "এই ঘণ্টায় পোস্ট হয়ে গেছে", no_candidate: "পোস্ট করার মতো নতুন খবর নেই", paused: "বিরতিতে (আগের ত্রুটির কারণে)", daily_limit: "দিনের সীমা পূর্ণ", disabled: "বন্ধ" }[fbStats.skipped] ?? fbStats.skipped})`
+      : `- ফেসবুক${fbDry ? " (ড্রাই-রান, কিছু পাঠানো হয়নি; কার্ড Artifact এ)" : ""}: ${fbDry ? fbStats.preview.length : fbStats.sent}টি পোস্ট${fbStats.source ? ` (${fbStats.source === "digest" ? "এআই ব্রিফ" : "সাধারণ খবর"})` : ""}`
+  );
+  for (const e of fbStats.errors) lines.push(`  - ⚠️ ${e}`);
+  if (fbDry) for (const p of fbStats.preview) lines.push("", "```", p.headline, "", p.caption, "```");
+} else if (fbError) {
+  lines.push(`- ফেসবুক: ⚠️ ${fbError}`);
+} else {
+  lines.push("- ফেসবুক: বন্ধ (FACEBOOK_PAGE_TOKEN / FACEBOOK_PAGE_ID নেই)");
 }
 if (stats.feedsFailed.length) lines.push("", "### ফেল করা ফিড", ...stats.feedsFailed.map((f) => `- ${f}`));
 const summary = lines.join("\n");

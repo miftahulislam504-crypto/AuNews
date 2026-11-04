@@ -61,6 +61,14 @@ export function createFsStore(dir) {
       await mkdir(feedsDir, { recursive: true });
       await writeFile(path.join(feedsDir, "telegram.json"), JSON.stringify(data));
     },
+    // ফেসবুক পেজে কী কী পোস্ট হয়েছে: feeds/facebook.json
+    async loadFacebook() {
+      return (await readJson(path.join(feedsDir, "facebook.json"))) ?? {};
+    },
+    async saveFacebook(data) {
+      await mkdir(feedsDir, { recursive: true });
+      await writeFile(path.join(feedsDir, "facebook.json"), JSON.stringify(data));
+    },
     // ভিডিও (YouTube): feeds/videos.json (items, resolved)
     async loadVideos() {
       return (await readJson(path.join(feedsDir, "videos.json"))) ?? {};
@@ -70,12 +78,12 @@ export function createFsStore(dir) {
       await writeFile(path.join(feedsDir, "videos.json"), JSON.stringify(data));
     },
     // সব স্ন্যাপশট মোছে; মোছা ফাইলের সংখ্যা ফেরত দেয়
-    // (digest/daily/telegram/videos এর নিজস্ব মেয়াদ আছে; মুছলে টেলিগ্রামে একই পোস্ট আবার যেত)
+    // (digest/daily/telegram/facebook/videos এর নিজস্ব মেয়াদ আছে; মুছলে টেলিগ্রাম/ফেসবুকে একই পোস্ট আবার যেত)
     async wipe() {
       let n = 0;
       try {
         for (const f of await readdir(feedsDir)) {
-          if (f === "digest.json" || f === "daily.json" || f === "telegram.json" || f === "videos.json") continue;
+          if (f === "digest.json" || f === "daily.json" || f === "telegram.json" || f === "facebook.json" || f === "videos.json") continue;
           await rm(path.join(feedsDir, f));
           n++;
         }

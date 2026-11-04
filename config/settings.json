@@ -102,6 +102,20 @@
     "delayMs": 1500,
     "maxTries": 3
   },
+  "facebook": {
+    "enabled": true,
+    "intervalMinutes": 60,
+    "maxAgeHours": 12,
+    "dailyMax": 30,
+    "maxTries": 3,
+    "maxAttempts": 2,
+    "fallbackToNews": true,
+    "newsMinSources": 2,
+    "hashtags": [
+      "#AuNews"
+    ],
+    "apiVersion": "v25.0"
+  },
   "matches": {
     "enabled": true,
     "football": {
