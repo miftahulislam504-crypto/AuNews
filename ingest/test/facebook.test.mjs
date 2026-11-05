@@ -44,10 +44,14 @@ test("formatDigestCaption: ভূমিকা, সর্বোচ্চ ৩ প�
   assert.ok(formatDigestCaption(digest("x", 1, { lead: "ক".repeat(5000) }), SITE).length < 2500);
 });
 
-test("formatNewsCaption: সূত্র ও মূল লিংক থাকে; সারাংশ না থাকলেও চলে", () => {
-  const c = formatNewsCaption({ summary: "", sourceName: "প্রথম আলো", link: "https://a.test/1" }, SITE);
-  assert.ok(c.includes("সূত্র: প্রথম আলো") && c.includes("https://a.test/1") && c.includes(SITE));
+test("formatNewsCaption: সূত্রের নাম ও নিজের সাইটের খবরের লিংক থাকে; মূল সোর্সের লিংক নয়; সারাংশ না থাকলেও চলে", () => {
+  const id = "0123456789abcdef0123";
+  const c = formatNewsCaption({ summary: "", sourceName: "প্রথম আলো", id, link: "https://a.test/1" }, SITE);
+  assert.ok(c.includes("সূত্র: প্রথম আলো") && c.includes(`পুরো খবর: ${SITE}/n/${id}`) && c.includes(`আরও খবর: ${SITE}`));
+  assert.ok(!c.includes("https://a.test/1"));
   assert.ok(!c.startsWith("\n"));
+  const noId = formatNewsCaption({ summary: "", sourceName: "প্রথম আলো" }, SITE);
+  assert.ok(!noId.includes("পুরো খবর") && noId.includes(SITE));
 });
 
 test("runFacebook: সবচেয়ে নতুন ব্রিফ আগে, রানে একটিই; একই স্লটে আবার নয়; পরের স্লটে পরেরটি", async () => {
@@ -97,7 +101,7 @@ test("runFacebook: নতুন ব্রিফ না থাকলে বহু
   await run({ store, client: c });
   assert.equal(c.posts[0].image.toString(), "img:শিরোনাম d1"); // ব্রিফ আগে
   await run({ store, client: c, now: NOW + H });
-  assert.ok(c.posts[1].caption.includes("https://n.test/")); // সাধারণ খবর; বেশি সোর্সের k1
+  assert.ok(c.posts[1].caption.includes(`${SITE}/n/`) && !c.posts[1].caption.includes("https://n.test/")); // সাধারণ খবর; নিজের সাইটের লিংক; বেশি সোর্সের k1
   assert.ok(c.posts[1].caption.includes("সূত্র: সোর্স"));
   await run({ store, client: c, now: NOW + 2 * H });
   await run({ store, client: c, now: NOW + 3 * H });
