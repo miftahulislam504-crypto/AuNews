@@ -50,8 +50,9 @@ export function formatNewsCaption(n, siteUrl, hashtags = FB_DEFAULTS.hashtags) {
   const parts = [];
   if (n.summary) parts.push(clip(oneLine(n.summary), 400));
   const src = n.sourceName ? `📰 সূত্র: ${n.sourceName}\n` : "";
-  parts.push(`${src}🔗 পুরো খবর: ${n.link}`);
-  parts.push(`🌐 আরও খবর: ${siteUrl}`);
+  // মূল সোর্সের (লম্বা, %-এনকোড করা) লিংক নয়; নিজের সাইটের খবরের পাতা (/n/{id})। আইডি না থাকলে লিংক ছাড়াই
+  const own = n.id ? `🔗 পুরো খবর: ${siteUrl}/n/${n.id}\n` : "";
+  parts.push(`${src}${own}🌐 আরও খবর: ${siteUrl}`.trim());
   if (hashtags.length) parts.push(hashtags.join(" "));
   return parts.filter(Boolean).join("\n\n");
 }
@@ -158,7 +159,7 @@ function newsCandidates({ items, posted, tries, cfg, now }) {
         imageUrl: rep.image || null,
         imageUrls: sorted.map((m) => m.image).filter(Boolean),
         pageUrls: [rep.link, ...sorted.map((m) => m.link)].filter(Boolean),
-        caption: (siteUrl, tags) => formatNewsCaption({ summary: bnSummary(rep), sourceName: rep.sourceName, link: rep.link }, siteUrl, tags),
+        caption: (siteUrl, tags) => formatNewsCaption({ summary: bnSummary(rep), sourceName: rep.sourceName, id: rep.id }, siteUrl, tags),
       },
     });
   }
