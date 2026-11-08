@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Hind_Siliguri, Noto_Serif_Bengali } from "next/font/google";
+import { Hind_Siliguri } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import settings from "@/config/settings.json";
@@ -7,22 +8,18 @@ import BottomNav from "@/components/BottomNav";
 import CategoryTabs from "@/components/CategoryTabs";
 import DateLine from "@/components/DateLine";
 import HeaderActions from "@/components/HeaderActions";
+import HeaderWeather from "@/components/HeaderWeather";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import SocialLinks from "@/components/SocialLinks";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-// UI লেখা: Hind Siliguri, শিরোনাম: Noto Serif Bengali (next/font নিজেই হোস্ট করে, বাইরের রিকোয়েস্ট লাগে না)
+// সব লেখা: Hind Siliguri (next/font নিজেই হোস্ট করে, বাইরের রিকোয়েস্ট লাগে না)
 const ui = Hind_Siliguri({
   subsets: ["bengali", "latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-ui",
-});
-const serif = Noto_Serif_Bengali({
-  subsets: ["bengali", "latin"],
-  weight: ["700"],
-  display: "swap",
-  variable: "--font-serif",
 });
 
 // গুগলের সার্চ রেজাল্টে যে বর্ণনা দেখাবে (১৫০ অক্ষরের কাছাকাছি রাখুন)
@@ -49,8 +46,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover", // PWA তে নিচের মেনু যেন ফোনের নিচের বারের নিচে না ঢোকে (safe-area)
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0b4f3c" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a2f25" },
+    { media: "(prefers-color-scheme: light)", color: "#001B4D" },
+    { media: "(prefers-color-scheme: dark)", color: "#001B4D" },
   ],
 };
 
@@ -66,30 +63,42 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="bn" className={`${ui.variable} ${serif.variable}`}>
+    <html lang="bn" className={ui.variable}>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-        <header className="topbar">
-          <div className="topbar-inner">
-            <Link href="/" className="brand">
-              {settings.site.name}
-            </Link>
-            <DateLine />
-            <HeaderActions />
+        <header className="site-head">
+          <div className="topstrip">
+            <div className="strip-in">
+              <DateLine />
+              <HeaderWeather />
+              <SocialLinks />
+            </div>
           </div>
-          <CategoryTabs />
+          <div className="mast">
+            <div className="mast-in">
+              <Link href="/" className="brand" aria-label={`${settings.site.name} — হোম`}>
+                <Image src="/logo.png" alt={settings.site.name} width={580} height={320} priority />
+              </Link>
+              <HeaderActions />
+            </div>
+          </div>
         </header>
+        <CategoryTabs />
         <main className="container">{children}</main>
         <footer className="footer">
-          <p className="footer-tag" lang="en">
-            {settings.site.taglineEn}
-          </p>
-          <p className="footer-note" lang="en">
-            Each story belongs to its original source. A link to the original is provided with every story.
-          </p>
-          <p className="footer-note">
-            <Link href="/about">আমাদের সম্পর্কে</Link> · <Link href="/ai">এআই ব্রিফ</Link> · <a href="/feed.xml">RSS</a>
-          </p>
+          <div className="footer-in">
+            <Image src="/logo.png" alt={settings.site.name} width={580} height={320} className="footer-logo" />
+            <SocialLinks className="social social-foot" />
+            <p className="footer-tag" lang="en">
+              {settings.site.taglineEn}
+            </p>
+            <p className="footer-note" lang="en">
+              Each story belongs to its original source. A link to the original is provided with every story.
+            </p>
+            <p className="footer-note">
+              <Link href="/about">আমাদের সম্পর্কে</Link> · <Link href="/ai">এআই ব্রিফ</Link> · <a href="/feed.xml">RSS</a>
+            </p>
+          </div>
         </footer>
         <BottomNav />
         <ServiceWorkerRegister />

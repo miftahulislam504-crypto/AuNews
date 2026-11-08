@@ -38,21 +38,23 @@ export default function HeaderActions() {
           ইনস্টল
         </button>
       ) : null}
-      <Link href="/search" className="icon-btn" aria-label="খুঁজুন">
+      <Link href="/search" className="search-pill" aria-label="খুঁজুন">
+        <span className="sp-text">খবর খুঁজুন…</span>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
           <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
           <path d="M20 20l-4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </Link>
-      <Link href="/saved" className="icon-btn" aria-label="সংরক্ষিত">
+      <Link href="/video" className="live-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="8" width="18" height="12" rx="3" />
+          <path d="M8 3.5l4 4 4-4" />
+        </svg>
+        <span>লাইভ টিভি</span>
+      </Link>
+      <Link href="/saved" className="icon-btn saved-btn" aria-label="সংরক্ষিত">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-          <path
-            d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
+          <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
         </svg>
       </Link>
     </div>

@@ -27,7 +27,13 @@ export default function CategoryTabs() {
   if (!visible) return null;
 
   return (
+    <div className="navbar">
     <nav className="tabs" ref={ref} aria-label="ক্যাটাগরি">
+      <Link href="/" className="home-tile" aria-label="হোম">
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor">
+          <path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />
+        </svg>
+      </Link>
       {tabs.map((t) => {
         const active = pathname === t.href || (t.id === "daily" && pathname.startsWith("/daily/"));
         return (
@@ -37,5 +43,6 @@ export default function CategoryTabs() {
         );
       })}
     </nav>
+    </div>
   );
 }

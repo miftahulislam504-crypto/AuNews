@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { ReactNode } from "react";
+import categories from "@/config/categories.json";
 import { toBn } from "@/lib/bn";
 import { hueStyle, opensInApp } from "@/lib/reader";
 import type { FeedItem } from "@/lib/types";
@@ -64,6 +65,7 @@ export default function NewsCard({
   const title = item.titleBn ?? item.title;
   const summary = item.summaryBn ?? (item.titleBn ? "" : item.summary);
   const showImg = Boolean(item.image) && imgOk;
+  const catBn = lead ? categories.find((c) => c.id === item.category)?.bn : undefined;
   const hasOthers = Boolean(others && others.length > 0);
   const sources = hasOthers ? uniqueSources([item, ...(others as FeedItem[])]) : [];
   const n = sourceCount ?? 1;
@@ -73,6 +75,7 @@ export default function NewsCard({
     <li className={cls}>
       <ItemLink item={item} forceExternal={forceExternal} className="card-link">
         <div className="card-body">
+          {catBn ? <span className="lead-badge">{catBn}</span> : null}
           <h2 className="card-title">{title}</h2>
           {item.titleBn ? (
             <p className="card-orig" lang="en">

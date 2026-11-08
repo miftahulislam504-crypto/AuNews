@@ -1,3 +1,4 @@
+import BreakingTicker from "@/components/BreakingTicker";
 import FeedList from "@/components/FeedList";
 import { getFeed } from "@/lib/feed";
 
@@ -15,10 +16,8 @@ export default async function Home() {
   const { items, updatedLabel } = await getFeed("all");
   return (
     <>
+      <BreakingTicker item={items[1] ?? items[0]} />
       <h1 className="page-title">সর্বশেষ</h1>
-      <p className="updated">
-        AuNews একটি স্বয়ংক্রিয় ই-নিউজপেপার: বাংলাদেশ ও বিশ্বের একাধিক সংবাদমাধ্যমের খবর প্রতি ৩০ মিনিটে নিজে থেকে সংগ্রহ হয়, আর একই ঘটনার খবর মিলিয়ে এআই লেখে সংক্ষিপ্ত ব্রিফ, মূল সোর্সের লিংকসহ।
-      </p>
       <FeedList items={items.slice(0, HOME_LIMIT)} updatedLabel={updatedLabel} />
     </>
   );

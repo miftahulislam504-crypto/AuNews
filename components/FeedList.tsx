@@ -13,7 +13,8 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "intl", label: "আন্তর্জাতিক" },
 ];
 
-export default function FeedList({ items, updatedLabel }: { items: FeedItem[]; updatedLabel?: string | null }) {
+// filters={true} দিলে আগের "সব / বাংলাদেশ / আন্তর্জাতিক" চিপ আর সোর্স ড্রপডাউন ফিরে আসবে
+export default function FeedList({ items, filters = false }: { items: FeedItem[]; updatedLabel?: string | null; filters?: boolean }) {
   const [scope, setScope] = useState<Filter>("all");
   const [source, setSource] = useState("all");
 
@@ -34,6 +35,7 @@ export default function FeedList({ items, updatedLabel }: { items: FeedItem[]; u
 
   return (
     <section>
+      {filters ? (
       <div className="filters">
         <div className="chips" role="group" aria-label="অঞ্চল ফিল্টার">
           {FILTERS.map((f) => (
@@ -63,7 +65,7 @@ export default function FeedList({ items, updatedLabel }: { items: FeedItem[]; u
           </select>
         ) : null}
       </div>
-      {updatedLabel ? <p className="updated">আপডেট: {updatedLabel}</p> : null}
+      ) : null}
       {groups.length === 0 ? (
         <p className="empty">এখনো কোনো খবর নেই। কিছুক্ষণ পর আবার দেখুন।</p>
       ) : (
