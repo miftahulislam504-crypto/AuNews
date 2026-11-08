@@ -25,12 +25,16 @@ const serif = Noto_Serif_Bengali({
   variable: "--font-serif",
 });
 
+// গুগলের সার্চ রেজাল্টে যে বর্ণনা দেখাবে (১৫০ অক্ষরের কাছাকাছি রাখুন)
+const DESC =
+  "বাংলাদেশ ও বিশ্বের সব খবর, প্রতি ৩০ মিনিটে নিজে থেকে হালনাগাদ হয় যে স্বয়ংক্রিয় ই-নিউজপেপারে। একাধিক সংবাদমাধ্যমের খবর মিলিয়ে এআই ব্রিফ, মূল সোর্সের লিংকসহ।";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${settings.site.name} — ${settings.site.tagline}`, template: `%s | ${settings.site.name}` },
-  description: settings.site.tagline,
+  description: DESC,
   applicationName: settings.site.name,
-  openGraph: { type: "website", siteName: settings.site.name, locale: "bn_BD", description: settings.site.tagline },
+  openGraph: { type: "website", siteName: settings.site.name, locale: "bn_BD", description: DESC },
   twitter: { card: "summary" },
   alternates: { types: { "application/rss+xml": "/feed.xml" } },
   // Search Console / Bing Webmaster যাচাইয়ের কোড Vercel → Environment Variables এ দিন
@@ -50,10 +54,21 @@ export const viewport: Viewport = {
   ],
 };
 
+// গুগলকে সাইটের নাম জানায়: সার্চ রেজাল্টে "Vercel" এর বদলে "AuNews" দেখানোর জন্য
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: settings.site.name,
+  alternateName: `${settings.site.name} — ${settings.site.tagline}`,
+  url: `${SITE_URL}/`,
+  inLanguage: "bn",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="bn" className={`${ui.variable} ${serif.variable}`}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         <header className="topbar">
           <div className="topbar-inner">
             <Link href="/" className="brand">
