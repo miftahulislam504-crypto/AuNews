@@ -17,21 +17,8 @@
   --tint: 40%;
   --fill: 32%;
   --wrap: 720px;
+  color-scheme: light; /* ফোন ডার্ক মোডে থাকলেও অ্যাপ সবসময় light */
   --serif: var(--font-ui), "Noto Sans Bengali", "Kalpurush", "Siyam Rupali", system-ui, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #061633;
-    --surface: #0c2049;
-    --ink: #ffffff;
-    --muted: #aab8d0;
-    --line: #1a3060;
-    --link: #4da3ff;
-    --soft: #0f2a5c;
-    --tint: 62%;
-    --fill: 38%;
-  }
 }
 
 @media (min-width: 960px) {
@@ -236,16 +223,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 }
 .search-input:focus { outline: 2px solid var(--link); outline-offset: 1px; }
 
-/* ---------- Footer ---------- */
-.footer {
-  max-width: var(--wrap);
-  margin: 0 auto;
-  padding: 20px 16px calc(28px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--line);
-}
-.footer-tag { font-family: var(--serif); font-size: 15px; font-weight: 700; margin: 0 0 6px; }
-.footer-note { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 0; }
-
 /* ---------- Reader (ইন-অ্যাপ খবর পড়া) ---------- */
 .reader-bar { display: flex; align-items: center; justify-content: space-between; max-width: 680px; margin: -8px auto 8px; }
 .back-btn {
@@ -330,7 +307,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .share-btn:active { background: var(--soft); }
 .share-msg { font-size: 13px; color: var(--muted); }
 .about p { font-size: 16.5px; line-height: 1.9; margin: 0 0 1em; }
-.footer-note a { text-decoration: underline; }
 
 /* ---------- আজকের বড় খবর ---------- */
 .daily-banner { display: flex; flex-direction: column; gap: 2px; margin: 0 0 18px; padding: 12px 14px; border-radius: 12px; background: var(--soft); border-left: 4px solid var(--accent); }
@@ -405,7 +381,6 @@ body:has(.bottomnav) { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0
 /* প্রোফাইল */
 .pf-msg { font-size: 13px; line-height: 1.6; margin: 10px 0 0; color: var(--link); }
 .pf-msg.err { color: #b3261e; }
-@media (prefers-color-scheme: dark) { .pf-msg.err { color: #ff8a80; } }
 .pf-links-card { display: flex; gap: 20px; font-size: 14.5px; }
 
 .btn {
@@ -481,13 +456,6 @@ body:has(.bottomnav) { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 .lead .card-meta time::before { display: inline-block; }
-
-.footer { max-width: none; margin: 24px 0 0; padding: 28px 16px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--header); border-top: 3px solid var(--breaking); }
-.footer-in { max-width: var(--wrap); margin: 0 auto; text-align: center; }
-.footer-logo { width: auto; height: 60px; margin: 0 auto 10px; }
-.footer .footer-tag { color: #fff; }
-.footer .footer-note { color: var(--sub); }
-.footer .footer-note a { color: #fff; }
 
 /* ---------- উপরের স্ট্রিপ: আবহাওয়া ও সোশ্যাল আইকন ---------- */
 .wx { display: inline-flex; align-items: center; gap: 7px; padding-left: 16px; border-left: 1px solid rgb(255 255 255 / 0.2); color: #fff; font-weight: 500; white-space: nowrap; }

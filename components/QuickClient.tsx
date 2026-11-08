@@ -21,14 +21,16 @@ function span(ms: number): string {
   return `${h ? `${toBn(h)} ঘণ্টা ` : ""}${m ? `${toBn(m)} মিনিট` : ""}`.trim();
 }
 
-// ম্যাচের সময় সবসময় ঢাকার সময়ে
+// ম্যাচের সময় সবসময় ঢাকার সময়ে, ইংরেজিতে ("Today 5:30 PM")
 function whenLabel(ms: number, now: number): string {
   const idx = (t: number) => Math.floor((t + 6 * 3600000) / DAY);
   const diff = idx(ms) - idx(now);
-  const time = fmtTime(new Date(ms), "Asia/Dhaka");
-  if (diff === 0) return `আজ ${time}`;
-  if (diff === 1) return `কাল ${time}`;
-  const d = new Intl.DateTimeFormat("bn-BD", { timeZone: "Asia/Dhaka", day: "numeric", month: "long" }).format(new Date(ms));
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Dhaka", hour: "numeric", minute: "2-digit", hour12: true })
+    .format(new Date(ms))
+    .replace(/\u202f/g, " ");
+  if (diff === 0) return `Today ${time}`;
+  if (diff === 1) return `Tomorrow ${time}`;
+  const d = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", day: "numeric", month: "short" }).format(new Date(ms));
   return `${d}, ${time}`;
 }
 
@@ -39,11 +41,11 @@ function MatchRow({ m, now }: { m: Match; now: number }) {
       {m.competition ? <p className="match-comp">{m.competition}</p> : null}
       <div className="match-row">
         <span className="match-team">{m.home}</span>
-        <span className="match-score">{upcoming ? "" : toBn(m.homeScore ?? "–")}</span>
+        <span className="match-score">{upcoming ? "" : (m.homeScore ?? "–")}</span>
       </div>
       <div className="match-row">
         <span className="match-team">{m.away}</span>
-        <span className="match-score">{upcoming ? "" : toBn(m.awayScore ?? "–")}</span>
+        <span className="match-score">{upcoming ? "" : (m.awayScore ?? "–")}</span>
       </div>
       <p className={m.state === "live" ? "match-note live" : "match-note"}>{upcoming ? whenLabel(m.startsAt, now) : m.note}</p>
     </li>
@@ -53,14 +55,14 @@ function MatchRow({ m, now }: { m: Match; now: number }) {
 function SportCard({ sport, matches, now }: { sport: Sport; matches: Match[]; now: number }) {
   const mine = matches.filter((m) => m.sport === sport);
   const groups: [string, Match[]][] = [
-    ["চলছে", mine.filter((m) => m.state === "live")],
-    ["আজকের ফলাফল", mine.filter((m) => m.state === "result")],
-    ["আসন্ন ম্যাচ", mine.filter((m) => m.state === "upcoming")],
+    ["Live", mine.filter((m) => m.state === "live")],
+    ["Today's Results", mine.filter((m) => m.state === "result")],
+    ["Upcoming Matches", mine.filter((m) => m.state === "upcoming")],
   ];
   const any = groups.some(([, l]) => l.length > 0);
   return (
-    <section className="q-card" aria-label={sport === "cricket" ? "ক্রিকেট" : "ফুটবল"}>
-      <h2 className="q-h">{sport === "cricket" ? "ক্রিকেট" : "ফুটবল"}</h2>
+    <section className="q-card" aria-label={sport === "cricket" ? "Cricket" : "Football"} lang="en">
+      <h2 className="q-h">{sport === "cricket" ? "Cricket" : "Football"}</h2>
       {any ? (
         groups.map(([title, list]) =>
           list.length ? (
@@ -75,7 +77,7 @@ function SportCard({ sport, matches, now }: { sport: Sport; matches: Match[]; no
           ) : null
         )
       ) : (
-        <p className="q-sub">আজকের কোনো ম্যাচের তথ্য নেই।</p>
+        <p className="q-sub">No match information for today.</p>
       )}
     </section>
   );

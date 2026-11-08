@@ -45,10 +45,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover", // PWA তে নিচের মেনু যেন ফোনের নিচের বারের নিচে না ঢোকে (safe-area)
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#001B4D" },
-    { media: "(prefers-color-scheme: dark)", color: "#001B4D" },
-  ],
+  themeColor: "#001B4D",
+  colorScheme: "light", // ফোনের সিস্টেম ডার্ক মোডে থাকলেও সবসময় light
 };
 
 // গুগলকে সাইটের নাম জানায়: সার্চ রেজাল্টে "Vercel" এর বদলে "AuNews" দেখানোর জন্য
@@ -85,21 +83,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </header>
         <CategoryTabs />
         <main className="container">{children}</main>
-        <footer className="footer">
-          <div className="footer-in">
-            <Image src="/logo.png" alt={settings.site.name} width={580} height={320} className="footer-logo" />
-            <SocialLinks className="social social-foot" />
-            <p className="footer-tag" lang="en">
-              {settings.site.taglineEn}
-            </p>
-            <p className="footer-note" lang="en">
-              Each story belongs to its original source. A link to the original is provided with every story.
-            </p>
-            <p className="footer-note">
-              <Link href="/about">আমাদের সম্পর্কে</Link> · <Link href="/ai">এআই ব্রিফ</Link> · <a href="/feed.xml">RSS</a>
-            </p>
-          </div>
-        </footer>
         <BottomNav />
         <ServiceWorkerRegister />
       </body>
