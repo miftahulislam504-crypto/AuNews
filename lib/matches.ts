@@ -1,9 +1,8 @@
 import manual from "@/config/matches.json";
 import settings from "@/config/settings.json";
-import { toBn } from "./bn";
-import { teamBn } from "./teamNames";
+import { teamEn } from "./teamNames";
 
-// "দ্রুত" পেজের ম্যাচ: আজকের ফলাফল, চলমান খেলা ও আসন্ন ম্যাচ (ক্রিকেট + ফুটবল)।
+// "দ্রুত" পেজের ম্যাচ: আজকের ফলাফল, চলমান খেলা ও আসন্ন ম্যাচ (ক্রিকেট + ফুটবল)। খেলার সব লেখা ইংরেজিতে।
 // ডেটার উৎস (যেটির key আছে সেটি চলে; কোনোটিই না থাকলে config/matches.json এর হাতে-দেওয়া তালিকা):
 //   ফুটবল — football-data.org (ফ্রি key: FOOTBALL_DATA_KEY)    ক্রিকেট — cricketdata.org (ফ্রি key: CRICAPI_KEY)
 export type Sport = "football" | "cricket";
@@ -57,9 +56,9 @@ async function fetchJson(url: string, headers: Record<string, string>, revalidat
 }
 
 // ---------- ফুটবল (football-data.org v4) ----------
-const COMP_BN: Record<string, string> = {
-  WC: "বিশ্বকাপ", EC: "ইউরো", CL: "চ্যাম্পিয়ন্স লিগ", PL: "ইংলিশ প্রিমিয়ার লিগ", PD: "লা লিগা", SA: "সিরি আ", BL1: "বুন্দেসলিগা",
-  FL1: "লিগ ১", DED: "এরেডিভিসি", PPL: "প্রিমেইরা লিগা", ELC: "চ্যাম্পিয়নশিপ", BSA: "ব্রাজিলিয়ান সিরি আ",
+const COMP_EN: Record<string, string> = {
+  WC: "World Cup", EC: "European Championship", CL: "Champions League", PL: "Premier League", PD: "La Liga", SA: "Serie A", BL1: "Bundesliga",
+  FL1: "Ligue 1", DED: "Eredivisie", PPL: "Primeira Liga", ELC: "Championship", BSA: "Brasileirão Série A",
 };
 const FD_LIVE = new Set(["IN_PLAY", "PAUSED", "LIVE"]);
 const FD_DONE = new Set(["FINISHED", "AWARDED"]);
@@ -82,16 +81,16 @@ export function parseFootball(data: unknown): Match[] {
     const ph = num(pens.home);
     const pa = num(pens.away);
     let note = "";
-    if (state === "live") note = status === "PAUSED" ? "বিরতি" : "চলছে";
-    else if (state === "result") note = ph !== null && pa !== null ? `পেনাল্টিতে ${toBn(ph)}–${toBn(pa)}` : "ম্যাচ শেষ";
+    if (state === "live") note = status === "PAUSED" ? "Half Time" : "Live";
+    else if (state === "result") note = ph !== null && pa !== null ? `Full Time (Pens ${ph}–${pa})` : "Full Time";
     const comp = o(m.competition);
     out.push({
       id: `fb${num(m.id) ?? `${startsAt}${str(home.name)}`}`,
       sport: "football",
       state,
-      competition: COMP_BN[str(comp.code)] ?? str(comp.name),
-      home: teamBn(str(home.name), str(home.shortName)),
-      away: teamBn(str(away.name), str(away.shortName)),
+      competition: COMP_EN[str(comp.code)] ?? str(comp.name),
+      home: teamEn(str(home.shortName), str(home.name)),
+      away: teamEn(str(away.shortName), str(away.name)),
       homeScore: state === "upcoming" || hs === null ? null : String(hs),
       awayScore: state === "upcoming" || as === null ? null : String(as),
       note,
@@ -117,14 +116,14 @@ async function footballMatches(now: number): Promise<Match[] | null> {
 function cricketNote(status: string, state: MatchState): string {
   const s = status.trim();
   const won = s.match(/^(.+?) won by (\d+) (runs?|wkts?|wickets?)/i);
-  if (won) return `${teamBn(won[1])} ${toBn(won[2])} ${/^r/i.test(won[3]) ? "রানে" : "উইকেটে"} জয়ী`;
-  if (/\btied?\b/i.test(s)) return "ম্যাচ টাই";
-  if (/no result/i.test(s)) return "ফলাফল নেই";
-  if (/abandon/i.test(s)) return "পরিত্যক্ত";
-  if (/\bdraw/i.test(s)) return "ড্র";
-  if (state === "live") return "চলছে";
+  if (won) return `${won[1]} won by ${won[2]} ${/^r/i.test(won[3]) ? (won[2] === "1" ? "run" : "runs") : won[2] === "1" ? "wicket" : "wickets"}`;
+  if (/\btied?\b/i.test(s)) return "Match Tied";
+  if (/no result/i.test(s)) return "No Result";
+  if (/abandon/i.test(s)) return "Abandoned";
+  if (/\bdraw/i.test(s)) return "Draw";
+  if (state === "live") return "Live";
   if (state === "upcoming") return "";
-  return s; // অচেনা ধাঁচ: যেমন আছে তেমন
+  return s; // অচেনা ধাঁচ: API-র ইংরেজি লেখাই যেমন আছে তেমন
 }
 
 function inningsScore(team: string, scores: unknown[]): string | null {
@@ -139,7 +138,7 @@ function inningsScore(team: string, scores: unknown[]): string | null {
     const ov = num(sc.o);
     parts.push(`${r}${w !== null ? `/${w}` : ""}${ov !== null ? ` (${ov})` : ""}`);
   }
-  return parts.length ? parts.join(" ও ") : null;
+  return parts.length ? parts.join(" & ") : null;
 }
 
 export function parseCricket(data: unknown, featured: string[]): Match[] {
@@ -160,8 +159,8 @@ export function parseCricket(data: unknown, featured: string[]): Match[] {
       sport: "cricket",
       state,
       competition: str(m.matchType).toUpperCase(),
-      home: teamBn(teams[0]),
-      away: teamBn(teams[1]),
+      home: teamEn(teams[0]),
+      away: teamEn(teams[1]),
       homeScore: state === "upcoming" ? null : inningsScore(teams[0], scores),
       awayScore: state === "upcoming" ? null : inningsScore(teams[1], scores),
       note: cricketNote(str(m.status), state),
@@ -195,8 +194,8 @@ export function parseManual(data: unknown, now: number): Match[] {
       sport,
       state,
       competition: str(m.competition),
-      home: teamBn(str(m.home)),
-      away: teamBn(str(m.away)),
+      home: teamEn(str(m.home)),
+      away: teamEn(str(m.away)),
       homeScore: str(m.homeScore) || null,
       awayScore: str(m.awayScore) || null,
       note: str(m.note),
